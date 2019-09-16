@@ -4,7 +4,9 @@ The goal of the project is to program the "Othello/Reversi" game where two peopl
 
 ## feature-AI01
 Implementation of a new heuristic function (v2.1)  
-Result: WR of 92% against the previous AI (v2.0) 
+Result:  
+- WR of 92% against the previous AI (v2.0 - Local Maximization) 
+- WR of 100% against random pos AI
 
 ## feature-AI02 [***W.I.P.***]
 Implementation of the Minimax algorithm (v2.2)  
