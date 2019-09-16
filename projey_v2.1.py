@@ -1,5 +1,5 @@
 # coding: utf-8
-# Version 2.0: Risk Regions implemented to AI
+# Version 2.1: Better heuristic function
 
 class Board_Reversi(object):
     """Plateau de jeu"""
@@ -10,7 +10,15 @@ class Board_Reversi(object):
     COLUMN_NUM = {c : i for i,c in enumerate("ABCDEFGH")}
     NUM_COLUMN = {i : c for i,c in enumerate("ABCDEFGH")}
     DIRECTIONS = [(x,y) for x in range(-1,2) for y in range(-1,2) if x or y]
-    
+    POSITION_WEIGHT =  [20,-3,11,8,8,11,-3,20,
+                        -3,-7,-4,1,1,-4,17,-3,
+                        11,-4,2,2,2,2,-4,11,
+                        8,1,2,-3,-3,2,1,8,
+                        8,1,2,-3,-3,2,1,8,
+                        11,-4,2,2,2,2,-4,11,
+                        -3,-7,-4,1,1,-4,17,-3,
+                        20,-3,11,8,8,11,-3,20]
+
     for pos, disk in zip([POS[key] for key in ("D4", "E5", "E4", "D5")], "OOXX"): # Positions initiales
         board["grille"][pos] = disk 
 
@@ -111,7 +119,7 @@ class Game_Reversi(Board_Reversi):
             self.count = 0
             if player.name == "L'ordinateur":
                 print "\nC'est le tour de l'ordinateur."
-                c, r = player.computer_pos(pos)
+                c, r = player.computer_pos(pos, self.players[self.DISK.index(Board_Reversi.ENNEMY_DISK[self.turn])])
                 print "\nL'ordinateur joue en {}{}".format(c,r)
                 player.play(c,r)
             else:
@@ -179,40 +187,155 @@ class Player_Reversi(Game_Reversi):
                     places.append(column+row)
         return places
 
-    def best_pos(self, pos):
-        best_point = int()
-        for c,r in pos:
-            board_duplicate = Board_Reversi.board["grille"][:]
-            self.play(c, r)
-            point = Board_Reversi.board["grille"].count(self.disk)
-            if point > best_point:
-                best_point, best_pos = point, c+r
-            Board_Reversi.board["grille"] = board_duplicate[:]
-        return best_pos
-
-    def computer_pos(self, pos):
+    def computer_pos(self, pos, ennemy):
         """Determine une position de jeu pour l'ordinateur"""
-        print pos
-        # Area 1 : On prend les coins si possible
-        for c, r in pos:
-            if (c == "A" and r in "18") or (c == "H" and r == "18"):
-                return c+r
-        # Area 2
-        area_2_pos = [c+r for c,r in pos if (c in "AH" and r in "3456") or (c in "CDEF" and r in "18")]
-        print area_2_pos
-        if area_2_pos:
-            return self.best_pos(area_2_pos)
-        # Area 3
-        area_3_pos = [c+r for c,r in pos if (c in "CDEF" and r in "3456")]
-        if area_3_pos:
-            return self.best_pos(area_3_pos)
-        # Area 4 
-        area_4_pos = [c+r for c,r in pos if (c in "BG" and r in "3456") or (c in "CDEF" and r in "27")]
-        if area_4_pos:
-            return self.best_pos(area_4_pos)
-        # Area 5 : Pire zone, donne acces aux coins
-        return self.best_pos(pos)
+        best_point = -10e4
+        for c,r in pos:
+            board_copy = Board_Reversi.board["grille"][:]
+            self.play(c, r)
+
+            # Difference de disques
+            player_disk = Board_Reversi.board["grille"].count(self.disk)
+            ennemy_disk = Board_Reversi.board["grille"].count(Board_Reversi.ENNEMY_DISK[self.disk])
+            if player_disk > ennemy_disk:
+                d = (100*player_disk)/float(player_disk+ennemy_disk)
+            elif player_disk < ennemy_disk:
+                d = -(100*ennemy_disk)/float(player_disk+ennemy_disk)
+            else:
+                d = 0
+
+            # Mobility
+            player_m = len(pos)
+            ennemy_m = len(ennemy.can_play())
+            if player_m > ennemy_m:
+                m = (100*player_m)/float(player_m+ennemy_m)
+            elif player_m < ennemy_m:
+                m = -(100*ennemy_m)/float(player_m+ennemy_m)
+            else:
+                m=0
+        
+            # Corner possesion
+            player_c, ennemy_c = 0, 0
+            if Board_Reversi.board["grille"][Board_Reversi.POS["A1"]] == self.disk:
+                player_c += 1
+            elif Board_Reversi.board["grille"][Board_Reversi.POS["A1"]] == Board_Reversi.ENNEMY_DISK[self.disk]: 
+                ennemy_c += 1
+
+            if Board_Reversi.board["grille"][Board_Reversi.POS["A8"]] == self.disk:
+                player_c += 1
+            elif Board_Reversi.board["grille"][Board_Reversi.POS["A8"]] == Board_Reversi.ENNEMY_DISK[self.disk]: 
+                ennemy_c += 1   
+
+            if Board_Reversi.board["grille"][Board_Reversi.POS["H1"]] == self.disk:
+                player_c += 1
+            elif Board_Reversi.board["grille"][Board_Reversi.POS["H1"]] == Board_Reversi.ENNEMY_DISK[self.disk]: 
+                ennemy_c += 1
+
+            if Board_Reversi.board["grille"][Board_Reversi.POS["H8"]] == self.disk:
+                player_c += 1
+            elif Board_Reversi.board["grille"][Board_Reversi.POS["H8"]] == Board_Reversi.ENNEMY_DISK[self.disk]: 
+                ennemy_c += 1
+
+            cpos = 25 * (player_c - ennemy_c)
+
+            # Corner proximity
+            player_cp, ennemy_cp = 0, 0
+            if Board_Reversi.board["grille"][Board_Reversi.POS["A1"]] == ".":
+                if Board_Reversi.board["grille"][Board_Reversi.POS["A2"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["A2"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["B1"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["B1"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["B2"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["B2"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
             
+            if Board_Reversi.board["grille"][Board_Reversi.POS["A8"]] == ".":
+                if Board_Reversi.board["grille"][Board_Reversi.POS["A7"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["A7"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["B7"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["B7"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["B8"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["B8"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+            if Board_Reversi.board["grille"][Board_Reversi.POS["H1"]] == ".":
+                if Board_Reversi.board["grille"][Board_Reversi.POS["H2"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["H2"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["G1"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["G1"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["G2"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["G2"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+            
+            if Board_Reversi.board["grille"][Board_Reversi.POS["H8"]] == ".":
+                if Board_Reversi.board["grille"][Board_Reversi.POS["H7"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["H7"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["G7"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["G7"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+
+                if Board_Reversi.board["grille"][Board_Reversi.POS["G8"]] == self.disk:
+                    player_cp += 1
+                elif Board_Reversi.board["grille"][Board_Reversi.POS["G8"]] == Board_Reversi.ENNEMY_DISK[self.disk]:
+                    ennemy_cp += 1
+            
+            cp = -12.5*(player_cp-ennemy_cp)
+
+            # Player weight
+            print c, type(c)
+            w = 0
+            if self.spot(c,r) == self.disk:
+                w += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[c+r]]
+            elif self.spot(c,r) == Board_Reversi.ENNEMY_DISK[self.disk]:
+                w -= Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[c+r]]
+
+            # Frontier disk
+            player_f, ennemy_f = 0, 0
+            for dc, dr in Board_Reversi.DIRECTIONS:
+                column, row = Board_Reversi().COLUMN_NUM[c] + dc, int(r) + dr
+                if self.is_on_board(column, row) and self.spot(Board_Reversi.NUM_COLUMN[column], str(row)) == ".":
+                    if self.spot(c,r) == self.disk:
+                        player_f += 1
+                    elif self.spot(c,r) == Board_Reversi.ENNEMY_DISK[self.disk]:
+                        ennemy_f += 1
+            if player_f > ennemy_f:
+                f = -(100*player_f)/float(player_f+ennemy_f)
+            elif player_f < ennemy_f:
+                f = 100*player_f/float(player_f+ennemy_f)
+            else:
+                f = 0
+            # Move score
+            score = 10*d + 801.724*cpos + 382.026*cp + 78.922*m + 74.396*f + 10*w
+            Board_Reversi.board["grille"] = board_copy
+
+            if score > best_point:
+                best_point, best_pos = score, c+r
+        return best_pos
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def ask_number(question, low, high):
