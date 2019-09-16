@@ -119,7 +119,7 @@ class Game_Reversi(Board_Reversi):
             self.count = 0
             if player.name == "L'ordinateur":
                 print "\nC'est le tour de l'ordinateur."
-                c, r = player.computer_pos(pos)
+                c, r = player.computer_pos(pos, self.players[self.DISK.index(Board_Reversi.ENNEMY_DISK[self.turn])])
                 print "\nL'ordinateur joue en {}{}".format(c,r)
                 player.play(c,r)
             else:
@@ -187,19 +187,9 @@ class Player_Reversi(Game_Reversi):
                     places.append(column+row)
         return places
 
-    def best_pos(self, pos):
-        best_point = int()
-        for c,r in pos:
-            board_duplicate = Board_Reversi.board["grille"][:]
-            self.play(c, r)
-            point = Board_Reversi.board["grille"].count(self.disk)
-            if point > best_point:
-                best_point, best_pos = point, c+r
-            Board_Reversi.board["grille"] = board_duplicate[:]
-        return best_pos
-
     def computer_pos(self, pos, ennemy):
         """Determine une position de jeu pour l'ordinateur"""
+        best_point = -10e4
         for c,r in pos:
             board_copy = Board_Reversi.board["grille"][:]
             self.play(c, r)
@@ -246,7 +236,7 @@ class Player_Reversi(Game_Reversi):
             elif Board_Reversi.board["grille"][Board_Reversi.POS["H8"]] == Board_Reversi.ENNEMY_DISK[self.disk]: 
                 ennemy_c += 1
 
-            c = 25 * (player_c - ennemy_c)
+            cpos = 25 * (player_c - ennemy_c)
 
             # Corner proximity
             player_cp, ennemy_cp = 0, 0
@@ -317,6 +307,7 @@ class Player_Reversi(Game_Reversi):
             cp = -12.5*(player_cp-ennemy_cp)
 
             # Player weight
+            print c, type(c)
             w = 0
             if self.spot(c,r) == self.disk:
                 w += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[c+r]]
@@ -339,10 +330,12 @@ class Player_Reversi(Game_Reversi):
             else:
                 f = 0
             # Move score
-            score = 10*d + 801.724*c + 382.026*cp + 78.922*m + 74.396*f + 10*w
+            score = 10*d + 801.724*cpos + 382.026*cp + 78.922*m + 74.396*f + 10*w
             Board_Reversi.board["grille"] = board_copy
 
-            
+            if score > best_point:
+                best_point, best_pos = score, c+r
+        return best_pos
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def ask_number(question, low, high):
