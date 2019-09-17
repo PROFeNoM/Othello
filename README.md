@@ -11,3 +11,6 @@ Result:
 ## feature-AI02 [***W.I.P.***]
 Implementation of the Minimax algorithm (v2.2)  
 Result: ***W.I.P.***
+
+### feature-REC01 [***W.I.P.***]
+Increased readability, clearness and efficiency of the code
