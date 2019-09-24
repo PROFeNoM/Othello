@@ -9,14 +9,14 @@ Result:
 - WR of 92% against the previous AI (v2.0 - Local Maximization) 
 - WR of 100% against random pos AI
 
-### feature-AI02 [***W.I.P.***]
+### feature-AI02 [***PAUSED***]
 Implementation of the Minimax algorithm (v2.2)  
 Result: ***W.I.P.***
 
 ## Various Size Board
-### feature-VB01 [***W.I.P***]
+### feature-VB01 [***W.I.P***] - (Highest Priority !)
 Change the whole project so it can handle a various-size board
 
 ## Clear Code 
-### feature-REC01 [***W.I.P.***]
+### feature-REC01 [***PAUSED***]
 Increased readability, clearness and efficiency of the code
