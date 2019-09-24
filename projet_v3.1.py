@@ -82,7 +82,7 @@ class Game_Reversi(Board_Reversi):
                     print Board_Reversi()
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
                 print "\n{} joue en {}!".format(player, user_choice.upper())
-                player.play(user_choice[0].upper(), user_choice[1], player.disk, True)
+                player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
         else:
