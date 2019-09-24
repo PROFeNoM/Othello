@@ -71,7 +71,7 @@ class Game_Reversi(Board_Reversi):
                         print Board_Reversi()
                         user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
                     print "\n{} joue en {}!".format(player, user_choice.upper())
-                    player.play(user_choice[0].upper(), user_choice[1], player.disk, True)
+                    player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
             else:
@@ -130,7 +130,7 @@ class Player_Reversi(Game_Reversi):
 
     def computer_pos(self, pos, ennemy):
         """Determine une position de jeu pour l'ordinateur"""
-        return pos[0]
+        return pos[0][0], pos[0][1:]
 
 def ask_number(question, low, high):
     """Ask for a number within a range."""
