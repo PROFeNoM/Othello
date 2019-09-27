@@ -11,7 +11,7 @@ Result:
 - WR of 100% against random pos AI
 
 ### feature-AI02 - [***W.I.P.***]
-Implementation of a heuristic function (v3.3)
+Implementation of a heuristic function (v3.3)  
 *Works for every size of board*
 Result: ***W.I.P.***
 
