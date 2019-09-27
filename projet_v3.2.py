@@ -1,8 +1,10 @@
 # coding: utf-8
+# feature-REC01
+# Increased readability, clearness and efficiency of the code
+
 class Board_Reversi(object):
     """Plateau de jeu"""
-    initialized = False
-    size = 8
+    initialized, size = False, 8 
     def __init__(self):
         if not self.initialized:
             print "\nFormat du plateau choisit: {}x{}".format(self.size, self.size)
@@ -38,14 +40,12 @@ class Game_Reversi(Board_Reversi):
     turn, turn_n, count = "X", 1, 0 # Si count = 2, alors deux tours d'affilé personne n'a joue. La partie est fini
 
     def __init__(self, names):
+        """Initialise les joueurs de la partie"""
         self.players = [Player_Reversi(disk, name) for name, disk in zip(names, Board_Reversi().DISK)]
 
     def change_turn(self):
         """Permet de savoir quel joueur va jouer"""
-        if self.turn == "X":
-            self.turn = "O"
-        else:
-            self.turn = "X"
+        self.turn = "O" if self.turn == "X" else "X"
     
     def game(self, computer=False):
         """Deroulement de la partie"""
@@ -59,12 +59,12 @@ class Game_Reversi(Board_Reversi):
             self.count = 0
             if computer:
                 if player.name == "L'ordinateur":
-                    print "\nC'est le tour de l'ordinateur."
+                    print "\nC'est le tour de l'ordinateur. ({})".format(player.disk)
                     c, r = player.computer_pos(pos, self.players[self.DISK.index(Board_Reversi.ENNEMY_DISK[self.turn])])
                     print "\nL'ordinateur joue en {}{}".format(c,r)
                     player.play(c,r, player.disk, True)
                 else:
-                    print "\n{}, c'est ton tour!".format(player)
+                    print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
                     while user_choice.upper() not in pos:
                         print "\nJouez une position legale!"
@@ -75,7 +75,7 @@ class Game_Reversi(Board_Reversi):
                 self.change_turn()
                 self.turn_n += 1
             else:
-                print "\n{}, c'est ton tour!".format(player)
+                print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                 user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
                 while user_choice.upper() not in pos:
                     print "\nJouez une position legale!"
@@ -89,18 +89,20 @@ class Game_Reversi(Board_Reversi):
             self.count += 1
             self.change_turn()
             print "{} ne peut pas jouer de position legale.".format(player)
-        return False
+        return False # La partie continue
     
 class Player_Reversi(Game_Reversi):
     """Joueur"""
     def __init__(self, disk, name):
+        """Caractérisation du joueur"""
         self.disk, self.name = disk, name
     
     def __str__(self):
+        """Renvoie le nom du joueur"""
         return self.name
     
     def can_play(self):
-        """Determine si un joueur a la possibilite de jouer ou non"""
+        """Renvoie la liste des positions légales de jeu pour le joueur"""
         print [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+27)][:Board_Reversi().size] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk)]
         return [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+27)][:Board_Reversi().size] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk)]
 
@@ -110,12 +112,12 @@ class Player_Reversi(Game_Reversi):
             return False
         for dc, dr in self.DIRECTIONS: # On se deplace dans une direction donnee et on verifie si on peut encercler
             c, r = self.POS[column] + dc, int(row) + dr
-            amount = 0 # on verifie s'il y a un disque ennemi dans la direction
+            amount = None # on verifie s'il y a un disque ennemi dans la direction
             while Board_Reversi().is_on_board(c, r) and self.spot(self.POS[c], str(r)) == self.ENNEMY_DISK[disk]:
                 c += dc
                 r += dr
-                amount += 1
-            if not Board_Reversi().is_on_board(c, r) or amount == 0 or not self.spot(self.POS[c], str(r)) == disk:
+                amount = True
+            if not Board_Reversi().is_on_board(c, r) or amount is None or not self.spot(self.POS[c], str(r)) == disk:
                 continue # On ne peut pas enclercler car soit il n'y a pas de disque ennemi dans la direction ou ce n'est pas un de nos disque au bout
             if swap:
                 c_swap, r_swap = self.POS[column], int(row)
@@ -138,16 +140,35 @@ def ask_number(question, low, high):
     while res not in range(low,high+1):
         try:
             res = int(input(question))
+            if res not in range(low, high+1):
+                print "Entrez une valeur entre {} et {}".format(2, 26)
         except:
             print "Entrez une reponse correcte."
     return res
 
+def winner(player_1, player_2, size):
+    """Détermine et affiche le gagnant/perdant de la partie"""
+    print "\n\tGrille finale:\n", Board_Reversi()
+    score_p1, score_p2 = Board_Reversi.board["grille"].count("X"), Board_Reversi.board["grille"].count("O")
+    if "." in Board_Reversi.board["grille"]:
+        if score_p1 > score_p2:
+            score_p1 += Board_Reversi.board["grille"].count(".")
+        elif score_p2 > score_p1:
+            score_p2 += Board_Reversi.board["grille"].count(".")
+    if score_p1 > score_p2:
+        print "\n{} gagne avec {} points, contre {} pour {} !".format(player_1, score_p1, score_p2, player_2)
+    elif score_p1 < score_p2:
+        print "\n{} gagne avec {} points, contre {} pour {} !".format(player_2, score_p2, score_p1, player_1)
+    else:
+        print "\nEGALITE! Les deux joueurs ont {} points!".format(size**2/2)
+            
 def main():
+    """Déroulement d'une partie d'Othello"""
     print "\t\t\t\t\tBienvenue sur Othello!"
     names = []
     user_choice_size = ask_number("""
                              Combien de lignes (ou colonnes) doit avoir le plateau ?
-                             --> """, low = 4, high = 26)
+                             --> """, low = 2, high = 26)
     Board_Reversi.size = user_choice_size
     user_choice_gm = ask_number("""
                              Choissisez un mode de jeu (1 ou 2):
@@ -163,62 +184,25 @@ def main():
                                  2.- Blanc
                                  
                                  --> """, low=1, high=2)
-        if user_choice_c == 1:
-            names = name + ["L'ordinateur"]
-        else:
-            names = ["L'ordinateur"] + name
-        
+        names = [name + ["L'ordinateur"] if user_choice_c == 1 else ["L'ordinateur"] + name]
         print "\nPour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
-        game = Game_Reversi(names)
-        over = False
+        game, over = Game_Reversi(names), False
         while not over:
             over = game.game(True)
-        print
-        print Board_Reversi()
-        p_1_point, p_2_point = Board_Reversi.board["grille"].count("X"), Board_Reversi.board["grille"].count("O")
-
-        if "." in Board_Reversi.board["grille"]:
-            if p_1_point > p_2_point:
-                p_1_point += Board_Reversi.board["grille"].count(".")
-            elif p_2_point > p_1_point:
-                p_2_point += Board_Reversi.board["grille"].count(".")
-
-        if p_1_point > p_2_point:
-            print "{} gagne avec {} points, contre {} pour {} !".format(names[0], p_1_point, p_2_point, names[1])
-        elif p_1_point < p_2_point:
-            print "{} gagne avec {} points, contre {} pour {} !".format(names[1], p_2_point, p_1_point, names[0])
-        else:
-            print "EGALITE! Les deux joueurs ont 32 points!"
+        winner(names[0], names[1], user_choice_size)
     
     else:
         for i in range(user_choice_gm):
-            names.append(raw_input("Entrez le nom du joueur {}: ".format(i+1)))
+            names.append(raw_input("Entrez le nom du joueur {} ({disk}): ".format(i+1, disk="X" if i==0 else "O")))
         print 
         print "Pour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
         game = Game_Reversi(names)
         over = False
         while not over:
             over = game.game()
-        print
-        print Board_Reversi()
-        p_1_point, p_2_point = Board_Reversi.board["grille"].count("X"), Board_Reversi.board["grille"].count("O")
+        winner(names[0], names[1], user_choice_size)
 
-        if "." in Board_Reversi.board["grille"]:
-            if p_1_point > p_2_point:
-                p_1_point += Board_Reversi.board["grille"].count(".")
-            else:
-                p_2_point += Board_Reversi.board["grille"].count(".")
-
-        if p_1_point > p_2_point:
-            print "{} gagne avec {} points, contre {} pour {} !".format(names[0], p_1_point, p_2_point, names[1])
-        elif p_1_point < p_2_point:
-            print "{} gagne avec {} points, contre {} pour {} !".format(names[1], p_2_point, p_1_point, names[0])
-        else:
-            print "EGALITE! Les deux joueurs ont 32 points!"
-
-    print "La partie est termine! A bientot."
-
-    
+    print "\nLa partie est termine! A bientot."
 
 main()
 
