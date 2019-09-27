@@ -18,5 +18,5 @@ Result: ***W.I.P.***
 Change the whole project so it can handle a various-size board
 
 ## Clear Code 
-### feature-REC01 [***PAUSED***]
+### feature-REC01 [***W.I.P.***]
 Increased readability, clearness and efficiency of the code
