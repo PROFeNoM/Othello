@@ -10,9 +10,14 @@ Result:
 - WR of 92% against the previous AI (v2.0 - Local Maximization) 
 - WR of 100% against random pos AI
 
-### feature-AI02 [***PAUSED***]
-Implementation of the Minimax algorithm (v2.2)  
+### feature-AI02 - [***W.I.P.***]
+Implementation of a heuristic function (v3.3)
+*Works for every size of board*
 Result: ***W.I.P.***
+
+### feature-AI03 - [***DELAYED***]
+Implementation of the Minimax algorithm
+Result: ***DELAYED***
 
 ## Various Size Board
 ### feature-VB01 
