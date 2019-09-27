@@ -16,8 +16,8 @@ Result: ***W.I.P.***
 
 ## Various Size Board
 ### feature-VB01 
-Change the whole project so it can handle a various-size board
+Change the whole project so it can handle a various-size board (v3.1)
 
 ## Clear Code 
 ### feature-REC01  
-Increased readability, clearness and efficiency of the code
+Increased readability, clearness and efficiency of the code (v3.2)
