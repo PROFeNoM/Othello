@@ -14,7 +14,7 @@ Implementation of the Minimax algorithm (v2.2)
 Result: ***W.I.P.***
 
 ## Various Size Board
-### feature-VB01 [***W.I.P***] - (Highest Priority !)
+### feature-VB01 
 Change the whole project so it can handle a various-size board
 
 ## Clear Code 
