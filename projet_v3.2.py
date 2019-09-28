@@ -184,7 +184,7 @@ def main():
                                  2.- Blanc
                                  
                                  --> """, low=1, high=2)
-        names = [name + ["L'ordinateur"] if user_choice_c == 1 else ["L'ordinateur"] + name]
+        names = [name + ["L'ordinateur"]] if user_choice_c == 1 else [["L'ordinateur"] + name]
         print "\nPour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
         game, over = Game_Reversi(names), False
         while not over:
