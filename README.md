@@ -15,9 +15,9 @@ Implementation of a heuristic function (v3.3)
 *Works for every size of board*
 Result: ***W.I.P.***
 
-### feature-AI03 - [***DELAYED***]
-Implementation of the Minimax algorithm
-Result: ***DELAYED***
+### feature-AI03 - [***W.I.P.***]
+Implementation of the Minimax algorithm with a local maximization evaluation function
+Result: ***W.I.P.***
 
 ## Various Size Board
 ### feature-VB01 
