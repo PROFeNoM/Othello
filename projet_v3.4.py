@@ -1,7 +1,7 @@
 # coding: utf-8
 # Branch : feature-AI03
-# Description : Implementation of the Minimax algorithm with a local maximization evaluation function
-# Version : 3.4
+# Description : Better evaluation function
+# Version : 3.4.1
 from copy import deepcopy
 
 class Board_Reversi(object):
@@ -162,10 +162,26 @@ class Player_Reversi(Game_Reversi):
         
     def evaluation(self, ennemy, board):
         """Renvoie un int correspondant au score du plateau du joueur"""
-        score = 0
+        # Poids du joueur : somme des points correspondant à l'emplacement des jetons
+        weight = 0
         for pos in Board_Reversi.POS:
             if (type(pos) is str) and len(pos)>1:
-                score += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
+                weight += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
+        
+        # Difference de jetons entre les joueurs
+        player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
+        diff = 100.*player_disk/(player_disk+ennemy_disk) if player_disk>ennemy_disk else -100.*ennemy_disk/(player_disk+ennemy_disk) if player_disk<ennemy_disk else 0
+
+        # Mobilité + AJOUTER UNE CONDITION SI LENNEMI PEUT JOUER UN COIN
+        player_mobi, ennemy_mobi = len(self.can_play(board)), len(ennemy.can_play(board))
+        mobi = 100.*player_mobi/(player_mobi+ennemy_mobi) if player_mobi>ennemy_mobi else -100.*ennemy_mobi/(player_mobi+ennemy_mobi) if player_mobi<ennemy_mobi else 0
+
+        if self.turn_n <= ((Board_Reversi().size)**2-4)/3: # early game
+            score = 100*mobi + 50*weight + 10*diff
+        elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3: # mid game
+            score = 100*mobi + 75*weight + 35*diff
+        else: 
+            score = 10*mobi + 50*weight + 100*diff
         return score
     
 
