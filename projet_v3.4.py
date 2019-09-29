@@ -193,9 +193,9 @@ class Player_Reversi(Game_Reversi):
         """Determine une position de jeu pour l'ordinateur"""
         best_score = -1e4 #-inf
         for c in pos:
-            if self.turn_n <= 20:
+            if self.turn_n <= ((Board_Reversi().size)**2-4)/3:
                 score = self.minimax(self, 2, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 2 tours
-            elif self.turn_n <= 40:
+            elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3:
                 score = self.minimax(self, 3, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 3 tours
             else: 
                 score = self.minimax(self, 4, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 4 tours
