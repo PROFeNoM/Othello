@@ -19,8 +19,8 @@ class Board_Reversi(object):
             # -- La section qui suit ne sert qu'à l'AI (cf. computer_pos()) --
             if self.size == 4:
                 Board_Reversi.POSITION_WEIGHT = [20, -3, -3, 20,
-                                                 -3, -7, -7, -3,
-                                                 -3, -7, -7, -3,
+                                                 -3, -3, -3, -3,
+                                                 -3, -3, -3, -3,
                                                  20, -3, -3, 20]
             elif self.size == 6:
                 Board_Reversi.POSITION_WEIGHT = [20, -3, 11, 11, -3, 20,
@@ -171,11 +171,8 @@ class Player_Reversi(Game_Reversi):
 
     def minimax(self, player, depth, is_maximizing_player, ennemy, board):
         """Minimax algorithm"""
-        print player.disk
-        print Board_Reversi()
         pos = player.can_play(board)
         if depth == 0 or not pos:
-            print "----"
             return player.evaluation(ennemy, board)
         if is_maximizing_player:
             best_score = -1e4 #-inf
@@ -196,7 +193,12 @@ class Player_Reversi(Game_Reversi):
         """Determine une position de jeu pour l'ordinateur"""
         best_score = -1e4 #-inf
         for c in pos:
-            score = self.minimax(self, 4, True, ennemy, Board_Reversi.board["grille"])
+            if self.turn_n <= 20:
+                score = self.minimax(self, 2, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 2 tours
+            elif self.turn_n <= 40:
+                score = self.minimax(self, 3, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 3 tours
+            else: 
+                score = self.minimax(self, 4, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 4 tours
             if score > best_score:
                 best_score, best_pos = score, c
         return best_pos
