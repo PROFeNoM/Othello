@@ -1,4 +1,4 @@
-# PROJET_S3
+# PROJET_S3 (Othello)
 
 The goal of the project is to program the "Othello/Reversi" game where two people can play together (on the same computer) or alone against the computer.
 
