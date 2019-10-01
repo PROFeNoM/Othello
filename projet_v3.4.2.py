@@ -1,7 +1,7 @@
 # coding: utf-8
 # Branch : feature-AI03
-# Description : New weight values
-# Version : 3.4.2
+# Description : Resolve Issue #5 (AI's computation time is too long)
+# Version : 3.4.2.2
 from copy import deepcopy
 
 class Board_Reversi(object):
@@ -11,29 +11,29 @@ class Board_Reversi(object):
         if not self.initialized:
             print "\nFormat du plateau choisit: {}x{}".format(self.size, self.size)
             Board_Reversi.board = {"d" : self.size, "grille": ['.']*(self.size**2)}
-            Board_Reversi.POS = {column + str(row) : x+self.size*y for x, column in enumerate([chr(i) for i in range(ord("A"), ord("A")+27)][:self.size]) for y, row in enumerate(range(1,self.size+1))}
-            Board_Reversi.POS.update({c : i for i,c in enumerate([chr(i) for i in range(ord("A"), ord("A")+27)][:self.size])}) # Colonne str -> int
-            Board_Reversi.POS.update({i : c for i,c in enumerate([chr(i) for i in range(ord("A"), ord("A")+27)][:self.size])}) # Colonne int -> str
+            Board_Reversi.POS = {column + str(row) : x+self.size*y for x, column in enumerate([chr(i) for i in range(ord("A"), ord("A")+self.size)]) for y, row in enumerate(range(1,self.size+1))}
+            Board_Reversi.POS.update({c : i for i,c in enumerate([chr(i) for i in range(ord("A"), ord("A")+self.size)])}) # Colonne str -> int
+            Board_Reversi.POS.update({i : c for i,c in enumerate([chr(i) for i in range(ord("A"), ord("A")+self.size)])}) # Colonne int -> str
             Board_Reversi.DISK, Board_Reversi.ENNEMY_DISK = "XO", {"X" : "O", "O" : "X"}
             Board_Reversi.DIRECTIONS = [(x,y) for x in range(-1,2) for y in range(-1,2) if x or y]
             # -- La section qui suit ne sert qu'à l'AI (cf. computer_pos()) --
             if self.size == 4:
-                Board_Reversi.POSITION_WEIGHT = [120, -20, -20, 120,
-                                                 -20,   3,   3, -20,
-                                                 -20,   3,   3, -20,
-                                                 120, -20, -20, 120]
+                Board_Reversi.POSITION_WEIGHT = [20, -3, -3, 20,
+                                                 -3, -3, -3, -3,
+                                                 -3, -3, -3, -3,
+                                                 20, -3, -3, 20]
             elif self.size == 6:
-                Board_Reversi.POSITION_WEIGHT = [120, -20, 20, 20, -20, 120,
-                                                 -20, -40, -5, -5, -40, -20,
-                                                 20,  -5,  15, 15,  -5,  20,
-                                                 20,  -5,  15, 15,  -5,  20,
-                                                 -20, -40, -5, -5, -40, -20,
-                                                 120, -20, 20, 20, -20, 120]
+                Board_Reversi.POSITION_WEIGHT = [20, -3, 11, 11, -3, 20,
+                                                 -3, -7, -4, -4, -7, -3,
+                                                 11, -4, 2, 2, -4, 11,
+                                                 11, -4, 2, 2, -4, 11,
+                                                 -3, -7, -4, -4, -7, -3,
+                                                 20, -3, 11, 11, -3, 20]
             elif self.size >= 8: # On pourrait tout faire en une ligne, mais ça nuierait à la compréhension; la vitesse d'execution serait plus rapide
-                line_1 = [120, -20, 20]+[5]*((self.size-6)/2); line_1 += line_1[::-1]
-                line_2 = [-20, -40]+[-5]*((self.size-4)/2); line_2 += line_2[::-1]
-                line_3 = [20, -5, 15]+[3]*((self.size-6)/2); line_3 += line_3[::-1]
-                line_middle = [5, -5]+[3]*((self.size-4)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
+                line_1 = [20, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
+                line_2 = [-3, -7, -4]+[1]*((self.size-6)/2); line_2 += line_2[::-1]
+                line_3 = [11, -4]+[2]*((self.size-4)/2); line_3 += line_3[::-1]
+                line_middle = [8, 1, 2]+[-3]*((self.size-6)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
                 Board_Reversi.POSITION_WEIGHT = line_1 + line_2 + line_3 + line_middle; Board_Reversi.POSITION_WEIGHT += Board_Reversi.POSITION_WEIGHT[::-1]
             # -- Fin de la section pour l'AI --
             for pos, disk in zip([Board_Reversi.POS[key] for key in (Board_Reversi.POS[self.size/2 - 1] + str(self.size/2), Board_Reversi.POS[self.size/2] + str(self.size/2 + 1), Board_Reversi.POS[self.size/2 - 1] + str(self.size/2 + 1), Board_Reversi.POS[self.size/2] + str(self.size/2))], "OOXX"): # Positions initiales
@@ -131,7 +131,7 @@ class Player_Reversi(Game_Reversi):
     
     def can_play(self, board=None):
         """Renvoie la liste des positions légales de jeu pour le joueur"""
-        return [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+27)][:Board_Reversi().size] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk, False, deepcopy(board))]
+        return [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+Board_Reversi().size)] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk, False, board)]
 
     def play(self, column, row, disk, swap=False, board=None): # (Board is not None) seulement w/ Minimax
         """Determine si un coup est legal ou non"""
@@ -154,10 +154,10 @@ class Player_Reversi(Game_Reversi):
                     r_swap += dr
                 if not board: # On change le tour si on utlise pas Minimax
                     self.change_turn()
-                else: # Pour minimax uniquement, on renvoie l'etat du plateau actuel
-                    return board
             else:
                 return True # Dans cette direction, un emplacement est donc disponible
+        if board and swap: # Pour minimax uniquement, on renvoie l'etat du plateau actuel seulement lorsque l'on change les pieces
+            return board
         return False # Dans toutes directions, il n'y a aucun enplacement
         
     def evaluation(self, ennemy, board):
@@ -166,22 +166,22 @@ class Player_Reversi(Game_Reversi):
         weight = 0
         for pos in Board_Reversi.POS:
             if (type(pos) is str) and len(pos)>1:
-                weight += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
+                weight -= Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
         
         # Difference de jetons entre les joueurs
-        player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
-        diff = 100.*player_disk/(player_disk+ennemy_disk) if player_disk>ennemy_disk else -100.*ennemy_disk/(player_disk+ennemy_disk) if player_disk<ennemy_disk else 0
+        #player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
+        #diff = 100.*player_disk/(player_disk+ennemy_disk) if player_disk>ennemy_disk else -100.*ennemy_disk/(player_disk+ennemy_disk) if player_disk<ennemy_disk else 0
 
         # Mobilité + AJOUTER UNE CONDITION SI LENNEMI PEUT JOUER UN COIN
-        player_mobi, ennemy_mobi = len(self.can_play(board)), len(ennemy.can_play(board))
-        mobi = 100.*player_mobi/(player_mobi+ennemy_mobi) if player_mobi>ennemy_mobi else -100.*ennemy_mobi/(player_mobi+ennemy_mobi) if player_mobi<ennemy_mobi else 0
+        #player_mobi, ennemy_mobi = len(self.can_play(board)), len(ennemy.can_play(board))
+        #mobi = 100.*player_mobi/(player_mobi+ennemy_mobi) if player_mobi>ennemy_mobi else -100.*ennemy_mobi/(player_mobi+ennemy_mobi) if player_mobi<ennemy_mobi else 0
 
-        if self.turn_n <= ((Board_Reversi().size)**2-4)/3: # early game
-            score = 100*mobi + 50*weight + 10*diff
-        elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3: # mid game
-            score = 100*mobi + 75*weight + 35*diff
-        else: 
-            score = 10*mobi + 50*weight + 100*diff
+        #if self.turn_n <= ((Board_Reversi().size)**2-4)/3: # early game
+        #    score = 100*mobi + 50*weight + 10*diff
+        #elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3: # mid game
+        #    score = 100*mobi + 75*weight + 35*diff
+        #else: 
+        #    score = 10*mobi + 50*weight + 100*diff
         return weight
     
 
@@ -201,7 +201,7 @@ class Player_Reversi(Game_Reversi):
             for c in pos:
                 board_copy = player.play(c[0], c[1:], player.disk, True, deepcopy(board))
                 score = self.minimax(ennemy, depth-1, True, player, board_copy)
-                best_score = max(best_score, score)
+                best_score = min(best_score, score)
         return best_score
 
 
@@ -209,12 +209,13 @@ class Player_Reversi(Game_Reversi):
         """Determine une position de jeu pour l'ordinateur"""
         best_score = -1e4 #-inf
         for c in pos:
+            board_copy = self.play(c[0], c[1:], self.disk, True, deepcopy(Board_Reversi.board["grille"]))
             if self.turn_n <= ((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(self, 2, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 2 tours
+                score = self.minimax(ennemy, 2, True, self, board_copy) # Anticipe sur 2 tours
             elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(self, 3, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 3 tours
+                score = self.minimax(ennemy, 3, True, self, board_copy) # Anticipe sur 3 tours
             else: 
-                score = self.minimax(self, 4, True, ennemy, Board_Reversi.board["grille"]) # Anticipe sur 4 tours
+                score = self.minimax(ennemy, 4, True, self, board_copy) # Anticipe sur 4 tours
             if score > best_score:
                 best_score, best_pos = score, c
         return best_pos
