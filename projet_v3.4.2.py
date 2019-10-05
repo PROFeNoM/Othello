@@ -18,19 +18,19 @@ class Board_Reversi(object):
             Board_Reversi.DIRECTIONS = [(x,y) for x in range(-1,2) for y in range(-1,2) if x or y]
             # -- La section qui suit ne sert qu'à l'AI (cf. computer_pos()) --
             if self.size == 4:
-                Board_Reversi.POSITION_WEIGHT = [20, -3, -3, 20,
+                Board_Reversi.POSITION_WEIGHT = [200, -3, -3, 200,
                                                  -3, -3, -3, -3,
                                                  -3, -3, -3, -3,
-                                                 20, -3, -3, 20]
+                                                 200, -3, -3, 200]
             elif self.size == 6:
-                Board_Reversi.POSITION_WEIGHT = [20, -3, 11, 11, -3, 20,
+                Board_Reversi.POSITION_WEIGHT = [200, -3, 11, 11, -3, 200,
                                                  -3, -7, -4, -4, -7, -3,
                                                  11, -4, 2, 2, -4, 11,
                                                  11, -4, 2, 2, -4, 11,
                                                  -3, -7, -4, -4, -7, -3,
-                                                 20, -3, 11, 11, -3, 20]
+                                                 200, -3, 11, 11, -3, 200]
             elif self.size >= 8: # On pourrait tout faire en une ligne, mais ça nuierait à la compréhension; la vitesse d'execution serait plus rapide
-                line_1 = [20, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
+                line_1 = [200, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
                 line_2 = [-3, -7, -4]+[1]*((self.size-6)/2); line_2 += line_2[::-1]
                 line_3 = [11, -4]+[2]*((self.size-4)/2); line_3 += line_3[::-1]
                 line_middle = [8, 1, 2]+[-3]*((self.size-6)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
@@ -163,26 +163,27 @@ class Player_Reversi(Game_Reversi):
     def evaluation(self, ennemy, board):
         """Renvoie un int correspondant au score du plateau du joueur"""
         # Poids du joueur : somme des points correspondant à l'emplacement des jetons
-        weight = 0
+        score = 0
         for pos in Board_Reversi.POS:
             if (type(pos) is str) and len(pos)>1:
-                weight -= Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
+                score -= Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
         
-        # Difference de jetons entre les joueurs
-        #player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
-        #diff = 100.*player_disk/(player_disk+ennemy_disk) if player_disk>ennemy_disk else -100.*ennemy_disk/(player_disk+ennemy_disk) if player_disk<ennemy_disk else 0
+        # Nombre de pièces : En avoir plus est important en late-game
+        if self.turn_n > (5./6)*Board_Reversi().size**2-4:
+            score += 20*(2*Board_Reversi.board["grille"].count("X")-self.turn_n)
 
-        # Mobilité + AJOUTER UNE CONDITION SI LENNEMI PEUT JOUER UN COIN
-        #player_mobi, ennemy_mobi = len(self.can_play(board)), len(ennemy.can_play(board))
-        #mobi = 100.*player_mobi/(player_mobi+ennemy_mobi) if player_mobi>ennemy_mobi else -100.*ennemy_mobi/(player_mobi+ennemy_mobi) if player_mobi<ennemy_mobi else 0
-
-        #if self.turn_n <= ((Board_Reversi().size)**2-4)/3: # early game
-        #    score = 100*mobi + 50*weight + 10*diff
-        #elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3: # mid game
-        #    score = 100*mobi + 75*weight + 35*diff
-        #else: 
-        #    score = 10*mobi + 50*weight + 100*diff
-        return weight
+        # Réduire la mobilité adversaire à partir du mid-game
+        ennemy_pos = len(ennemy.can_play(board))
+        if self.turn_n > (1./2)*Board_Reversi().size**2-4:
+            if ennemy_pos == 0:
+                score += 100
+            elif ennemy_pos < 3:
+                score += 50
+            else:
+                score -= ennemy_pos*13
+        
+        # Victoire
+        return score
     
 
     def minimax(self, player, depth, is_maximizing_player, ennemy, board):
