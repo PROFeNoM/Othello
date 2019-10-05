@@ -1,7 +1,7 @@
 # coding: utf-8
 # Branch : feature-AI03
-# Description : Resolve Issue #5 (AI's computation time is too long)
-# Version : 3.4.2.2
+# Description : wip Weak AI (Minimax algorithm) #4
+# Version : 3.4.2.3
 from copy import deepcopy
 
 class Board_Reversi(object):
@@ -162,18 +162,34 @@ class Player_Reversi(Game_Reversi):
         
     def evaluation(self, ennemy, board):
         """Renvoie un int correspondant au score du plateau du joueur"""
-        # Poids du joueur : somme des points correspondant à l'emplacement des jetons
+        ennemy_move = ennemy.can_play(board)
+        ennemy_pos = len(ennemy_move)
+        # Victoire 
+        if (board.count(".") == 0 and board.count(self.disk)>board.count(ennemy.disk)) or ((ennemy_pos == 0) and len(self.can_play(board)) == 0):
+            print "ui"
+            return 1e5
+
         score = 0
+        # Poids du joueur : somme des points correspondant à l'emplacement des jetons
+        # Frontier disk : Contribue à réduire la mobilité adverse
+        player_f, ennemy_f = 0, 0
         for pos in Board_Reversi.POS:
             if (type(pos) is str) and len(pos)>1:
                 score -= Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
-        
+                for dc, dr in Board_Reversi.DIRECTIONS:
+                    column, row = Board_Reversi.POS[pos[0]]+dc, int(pos[1:])+dr
+                    if self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == ".":
+                        if self.spot(pos[0], pos[1:], board) == self.disk:
+                            player_f += 1
+                        else:
+                            ennemy_f += 1
+        score += 25*(player_f-ennemy_f)
+
         # Nombre de pièces : En avoir plus est important en late-game
         if self.turn_n > (5./6)*Board_Reversi().size**2-4:
-            score += 20*(2*Board_Reversi.board["grille"].count("X")-self.turn_n)
+            score += 50*(board.count(self.disk)-board.count(ennemy.disk))
 
         # Réduire la mobilité adversaire à partir du mid-game
-        ennemy_pos = len(ennemy.can_play(board))
         if self.turn_n > (1./2)*Board_Reversi().size**2-4:
             if ennemy_pos == 0:
                 score += 100
@@ -181,8 +197,23 @@ class Player_Reversi(Game_Reversi):
                 score += 50
             else:
                 score -= ennemy_pos*13
+
+        # L'ennemi pourra jouer un corner
+        corner_pos = ["A1", chr(ord("A")+Board_Reversi().size-1)+"1", "A"+str(Board_Reversi().size), chr(ord("A")+Board_Reversi().size-1)+str(Board_Reversi().size)]
+        for i in corner_pos:
+            if i in ennemy_move:
+                score += -500
         
-        # Victoire
+        # Proximité aux coins
+            corner_prox = [["A2", "B1", "B2"], [chr(ord("A")+Board_Reversi().size-2)+"1", chr(ord("A")+Board_Reversi().size-2)+"2", chr(ord("A")+Board_Reversi().size-1)+"2"],
+                           ["A"+str(Board_Reversi().size-1), "B"+str(Board_Reversi().size-1), "B"+str(Board_Reversi().size)], [chr(ord("A")+Board_Reversi().size-2)+str(Board_Reversi().size), chr(ord("A")+Board_Reversi().size-2)+str(Board_Reversi().size-1), chr(ord("A")+Board_Reversi().size-1)+str(Board_Reversi().size-1)]]
+                # Cette liste correspond respectivement aux 3 positions adjacentes aux coins
+            player_cp, ennemy_cp = 0,0 
+            for i, corner in zip(range(4), corner_pos):
+                if board[Board_Reversi.POS[corner]] == ".":
+                    player_cp += (board[Board_Reversi.POS[corner_prox[i][0]]] == self.disk) + (board[Board_Reversi.POS[corner_prox[i][1]]] == self.disk) + (board[Board_Reversi.POS[corner_prox[i][2]]] == self.disk)
+                    ennemy_cp += (board[Board_Reversi.POS[corner_prox[i][0]]] == ennemy.disk) + (board[Board_Reversi.POS[corner_prox[i][1]]] == ennemy.disk) + (board[Board_Reversi.POS[corner_prox[i][2]]] == ennemy.disk)
+            score += -10*(player_cp-ennemy_cp)
         return score
     
 
