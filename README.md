@@ -10,15 +10,16 @@ Result:
 - **90%** WR against the previous AI (v2.0 - Local Maximization) 
 - **100%** against random pos AI
 
-### feature-AI02 - [***W.I.P.***]
+### feature-AI02
 Implementation of a heuristic function (v3.3)  
 *Works for every size of board*
-Result: ***W.I.P.***  
+Result:
 - 8x8 : **80%** WR against random pos AI...
+==> Aborted
 
-### feature-AI03 - [***W.I.P.***]
+### feature-AI03
 Implementation of the Minimax algorithm with a local maximization evaluation function
-Result: ***W.I.P.***
+Result: ***TBA***
 
 ## Various Size Board
 ### feature-VB01 
@@ -27,3 +28,6 @@ Change the whole project so it can handle a various-size board (v3.1)
 ## Clear Code 
 ### feature-REC01  
 Increased readability, clearness and efficiency of the code (v3.2)
+
+### feature-REC02 - [***W.I.P.***]
+Multiple file organization
