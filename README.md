@@ -18,7 +18,7 @@ Result:
 ==> Aborted
 
 ### feature-AI03
-Implementation of the Minimax algorithm with a local maximization evaluation function
+Implementation of the Minimax algorithm with a local maximization evaluation function  
 Result: ***TBA***
 
 ## Various Size Board
