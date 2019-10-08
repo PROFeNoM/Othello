@@ -6,7 +6,7 @@
 - Parity
 - Corner possesion
 - Disk differential
-# Version : 3.4.3
+# Version : 3.4.2.4
 """
 from copy import deepcopy
 
