@@ -36,7 +36,7 @@ class Board_Reversi(object):
                                                  -3, -7, -4, -4, -7, 3,
                                                  95, -3, 11, 11, -3, 95]
             elif self.size >= 8: # On pourrait tout faire en une ligne, mais ça nuierait à la compréhension; la vitesse d'execution serait plus rapide
-                line_1 = [20, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
+                line_1 = [95, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
                 line_2 = [-3, -7, -4]+[1]*((self.size-6)/2); line_2 += line_2[::-1]
                 line_3 = [11, -4, 2]+[2]*((self.size-6)/2); line_3 += line_3[::-1]
                 line_middle = [8, 1, 2]+[-3]*((self.size-6)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
