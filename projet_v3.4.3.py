@@ -236,23 +236,23 @@ class Player_Reversi(Game_Reversi):
         # Stability
         player_stab, ennemy_stab = 0, 0
         for i in range(4):
-            if board[Board_Reversi.POS[CORNER[i][0]]]==self.disk:
+            if board[Board_Reversi.POS[CORNER[i]]]==self.disk:
                 pieces = list()
                 for dc, dr in Board_Reversi.DIRECTIONS:
-                    column, row = Board_Reversi.POS[CORNER[i]]+dc, int(CORNER[i][1:])+dr
+                    column, row = Board_Reversi.POS[CORNER[i][0]]+dc, int(CORNER[i][1:])+dr
                     while self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == self.disk:
+                        pieces.append(Board_Reversi.POS[column]+str(row))
                         column += dc
                         row += dr
-                        pieces.append(column+row)
                 player_stab += len(set(pieces))
-            if board[Board_Reversi.POS[CORNER[i][0]]]==ennemy.disk:
+            if board[Board_Reversi.POS[CORNER[i]]]==ennemy.disk:
                 pieces = list()
                 for dc, dr in Board_Reversi.DIRECTIONS:
-                    column, row = Board_Reversi.POS[CORNER[i]]+dc, int(CORNER[i][1:])+dr
+                    column, row = Board_Reversi.POS[CORNER[i][0]]+dc, int(CORNER[i][1:])+dr
                     while self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == ennemy.disk:
+                        pieces.append(Board_Reversi.POS[column]+str(row))
                         column += dc
                         row += dr
-                        pieces.append(column+row)
                 ennemy_stab += len(set(pieces))
         stability = (100.*(player_stab-ennemy_stab))/(player_stab+ennemy_stab+1)
 
