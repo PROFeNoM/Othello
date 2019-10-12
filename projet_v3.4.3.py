@@ -1,14 +1,9 @@
 # coding: utf-8
 """
 # Branch : feature-AI03
-# Description : wip Weak AI (Minimax algorithm) #4 
-- Disk differential
-- Mobility
-- Position weight
-- Stability
-- Corner possesion
-- Frontier Disk
-# Version : 3.4.3.2
+# Description : wip Weak AI (alphabeta algorithm) #4 // AI's computation time is too long #5
+- AlphaBeta Pruning algorithm !
+# Version : 3.4.4
 """
 from copy import deepcopy
 
@@ -24,54 +19,6 @@ class Board_Reversi(object):
             Board_Reversi.POS.update({i : c for i,c in enumerate([chr(i) for i in range(ord("A"), ord("A")+self.size)])}) # Colonne int -> str
             Board_Reversi.DISK, Board_Reversi.ENNEMY_DISK = "XO", {"X" : "O", "O" : "X"}
             Board_Reversi.DIRECTIONS = [(x,y) for x in range(-1,2) for y in range(-1,2) if x or y]
-            # -- La section qui suit ne sert qu'à l'AI (cf. computer_pos()) --
-            Board_Reversi.WEIGHT_SET = [[8, 85, -40, 10, 210, 520],
-                                        [8, 85, -40, 10, 210, 520],
-                                        [33, -50, -15, 4, 416, 2153],
-                                        [46, -50, -1, 3, 612, 4141],
-                                        [51, -50, 62, 3, 595, 3184],
-                                        [33, -5, 66, 2, 384, 2777],
-                                        [44, 50, 163, 0, 443, 2568],
-                                        [13, 50, 66, 0, 121, 986],
-                                        [4, 50, 31, 0, 27, 192],
-                                        [8, 500, 77, 0, 36, 299]]
-            Board_Reversi.TURN_SET = [0]+[i for i in range(self.size**2-9, self.size**2)]
-            Board_Reversi.WEIGHT_TIME = {t : [None]*6 for t in range(self.size**2+1)}
-            for dc in range(self.size**2+1):
-                # détermine quel set utiliser pour un tour donné
-                w = 0
-                for i in range(len(Board_Reversi.TURN_SET)):
-                    if dc <= Board_Reversi.TURN_SET[i]:
-                        w = i
-                        break
-                # First set of weight
-                if w == 0:
-                    Board_Reversi.WEIGHT_TIME[dc] = Board_Reversi.WEIGHT_SET[0]
-                    continue
-                
-                factor = float((dc-Board_Reversi.TURN_SET[w-1]))/(Board_Reversi.TURN_SET[w]-Board_Reversi.TURN_SET[w-1])
-                for i in range(6):
-                    Board_Reversi.WEIGHT_TIME[dc][i] = int(factor*Board_Reversi.WEIGHT_SET[w][i]+(1-factor)*Board_Reversi.WEIGHT_SET[w-1][i])
-            print Board_Reversi.WEIGHT_TIME
-            if self.size == 4:
-                Board_Reversi.POSITION_WEIGHT = [100, 8, 8, 100,
-                                                 8, -3, -3, 8,
-                                                 8, -3, -3, 8,
-                                                 100, 8, 8, 100]
-            elif self.size == 6:
-                Board_Reversi.POSITION_WEIGHT = [100, -10, 8, 8, -10, 100,
-                                                 -10, -25, -4, -4, -25, -10,
-                                                 8, -4, 0, 0, -4, 8,
-                                                 8, -4, 0, 0, -4, 8,
-                                                 -10, -25, -4, -4, -25, -10,
-                                                 100, -10, 8, 8, -10, 100]
-            elif self.size >= 8: # On pourrait tout faire en une ligne, mais ça nuierait à la compréhension; la vitesse d'execution serait plus rapide
-                line_1 = [100, -10, 8]+[6]*((self.size-6)/2); line_1 += line_1[::-1]
-                line_2 = [-10, -25, -4]+[-4]*((self.size-6)/2); line_2 += line_2[::-1]
-                line_3 = [8, -4, 6]+[4]*((self.size-6)/2); line_3 += line_3[::-1]
-                line_middle = [6, -4, 4]+[0]*((self.size-6)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
-                Board_Reversi.POSITION_WEIGHT = line_1 + line_2 + line_3 + line_middle; Board_Reversi.POSITION_WEIGHT += Board_Reversi.POSITION_WEIGHT[::-1]
-            # -- Fin de la section pour l'AI --
             for pos, disk in zip([Board_Reversi.POS[key] for key in (Board_Reversi.POS[self.size/2 - 1] + str(self.size/2), Board_Reversi.POS[self.size/2] + str(self.size/2 + 1), Board_Reversi.POS[self.size/2 - 1] + str(self.size/2 + 1), Board_Reversi.POS[self.size/2] + str(self.size/2))], "OOXX"): # Positions initiales
                 Board_Reversi.board["grille"][pos] = disk
             Board_Reversi.initialized = True
@@ -94,7 +41,7 @@ class Board_Reversi(object):
     @staticmethod
     def place(column, row, disk, board=None):
         """Place un disque ("O" ou "X") a l'emplacement"""
-        if board: # Minimax algorithm
+        if board: # alphabeta algorithm
             board[Board_Reversi.POS[column+row]] = disk
         else:
             Board_Reversi.board["grille"][Board_Reversi.POS[column+row]] = disk
@@ -169,7 +116,7 @@ class Player_Reversi(Game_Reversi):
         """Renvoie la liste des positions légales de jeu pour le joueur"""
         return [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+Board_Reversi().size)] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk, False, board)]
 
-    def play(self, column, row, disk, swap=False, board=None): # (Board is not None) seulement w/ Minimax
+    def play(self, column, row, disk, swap=False, board=None): # (Board is not None) seulement w/ alphabeta
         """Determine si un coup est legal ou non"""
         if self.spot(column, row, board) is not ".": # L'emplacement est deja occupe
             return False
@@ -188,82 +135,62 @@ class Player_Reversi(Game_Reversi):
                     self.place(self.POS[c_swap], str(r_swap), self.disk, board)
                     c_swap += dc
                     r_swap += dr
-                if not board: # On change le tour si on utlise pas Minimax
+                if not board: # On change le tour si on utlise pas alphabeta
                     self.change_turn()
             else:
                 return True # Dans cette direction, un emplacement est donc disponible
-        if board and swap: # Pour minimax uniquement, on renvoie l'etat du plateau actuel seulement lorsque l'on change les pieces
+        if board and swap: # Pour alphabeta uniquement, on renvoie l'etat du plateau actuel seulement lorsque l'on change les pieces
             return board
         return False # Dans toutes directions, il n'y a aucun enplacement
         
     def evaluation(self, ennemy, board, depth):
         """Renvoie un int correspondant au score du plateau du joueur"""
         CORNER = ["A1", chr(ord("A")+Board_Reversi().size-1)+"1", "A"+str(Board_Reversi().size), chr(ord("A")+Board_Reversi().size-1)+str(Board_Reversi().size)]
+        X_SQUARES = ["B2", chr(ord("A")+Board_Reversi().size-2)+"2", "B"+str(Board_Reversi().size-1), chr(ord("A")+Board_Reversi().size-2)+str(Board_Reversi().size-1)]
+        C_SQUARES = [["A2", "B1"], [chr(ord("A")+Board_Reversi().size-2)+"1", chr(ord("A")+Board_Reversi().size-1)+"2"], ["A"+str(Board_Reversi().size-1), "B"+str(Board_Reversi().size)], [chr(ord("A")+Board_Reversi().size-2)+str(Board_Reversi().size), chr(ord("A")+Board_Reversi().size-1)+str(Board_Reversi().size-1)]]
         
-        # Mobility
-        player_m = self.can_play(board)
-        player_mobi, ennemy_mobi = len(player_m), len(ennemy.can_play(board))
-        mobi = (100.*(player_mobi-ennemy_mobi))/(player_mobi+ennemy_mobi+1)
-
-        # Poids du joueur : somme des points correspondant à l'emplacement des jetons
-        # Frontier disk : Contribue à réduire la mobilité adverse
-        player_f, ennemy_f = 0, 0
-        weight = 0
-        for pos in Board_Reversi.POS:
-            if (type(pos) is str) and len(pos)>1:
-                weight += Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==self.disk else -Board_Reversi.POSITION_WEIGHT[Board_Reversi.POS[pos]] if self.spot(pos[0], pos[1:], board)==ennemy.disk else 0
-                for dc, dr in Board_Reversi.DIRECTIONS:
-                    column, row = Board_Reversi.POS[pos[0]]+dc, int(pos[1:])+dr
-                    if self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == ".":
-                        if self.spot(pos[0], pos[1:], board) == self.disk:
-                            player_f += 1
-                        else:
-                            ennemy_f += 1
-        frontier = (100.*(player_f-ennemy_f))/(player_f+ennemy_f+1)
-
-        # Disk Differential
-        player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
-        diff = 100.*(player_disk-ennemy_disk)/(player_disk+ennemy_disk)
-
-        # Parity
-        # parity = -1 if (Board_Reversi().size**2-(player_disk+ennemy_disk))%2 == 0 else 1
-
         # Corner possesion
-        corner_poss = 0
-        for m in player_m:
-            if m in CORNER:
-                corner_poss += 100
+        player_corner = (board[Board_Reversi.POS[CORNER[0]]]==self.disk) + (board[Board_Reversi.POS[CORNER[1]]]==self.disk) + (board[Board_Reversi.POS[CORNER[2]]]==self.disk) + (board[Board_Reversi.POS[CORNER[3]]]==self.disk)
+        ennemy_corner = (board[Board_Reversi.POS[CORNER[0]]]==ennemy.disk) + (board[Board_Reversi.POS[CORNER[1]]]==ennemy.disk) + (board[Board_Reversi.POS[CORNER[2]]]==ennemy.disk) + (board[Board_Reversi.POS[CORNER[3]]]==ennemy.disk)
+        
+        # X Squares possesion
+        # C Squares possesion
+        player_X, ennemy_X = 0, 0
+        player_C, ennemy_C = 0, 0
+        for c in range(4):
+            if board[Board_Reversi.POS[CORNER[c]]]==".":
+                player_X += board[Board_Reversi.POS[X_SQUARES[c]]]==self.disk
+                player_C += board[Board_Reversi.POS[C_SQUARES[c][0]]]==self.disk + board[Board_Reversi.POS[C_SQUARES[c][1]]]==self.disk
+            elif board[Board_Reversi.POS[CORNER[c]]]==".":
+                ennemy_X += board[Board_Reversi.POS[X_SQUARES[c]]]==ennemy.disk
+                ennemy_C += board[Board_Reversi.POS[C_SQUARES[c][0]]]==ennemy.disk + board[Board_Reversi.POS[C_SQUARES[c][1]]]==ennemy.disk
 
-        # Stability
-        player_stab, ennemy_stab = 0, 0
-        for i in range(4):
-            if board[Board_Reversi.POS[CORNER[i]]]==self.disk:
-                pieces = list()
-                for dc, dr in Board_Reversi.DIRECTIONS:
-                    column, row = Board_Reversi.POS[CORNER[i][0]]+dc, int(CORNER[i][1:])+dr
-                    while self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == self.disk:
-                        pieces.append(Board_Reversi.POS[column]+str(row))
-                        column += dc
-                        row += dr
-                player_stab += len(set(pieces))
-            if board[Board_Reversi.POS[CORNER[i]]]==ennemy.disk:
-                pieces = list()
-                for dc, dr in Board_Reversi.DIRECTIONS:
-                    column, row = Board_Reversi.POS[CORNER[i][0]]+dc, int(CORNER[i][1:])+dr
-                    while self.is_on_board(column, row) and self.spot(Board_Reversi.POS[column], str(row), board) == ennemy.disk:
-                        pieces.append(Board_Reversi.POS[column]+str(row))
-                        column += dc
-                        row += dr
-                ennemy_stab += len(set(pieces))
-        stability = (100.*(player_stab-ennemy_stab))/(player_stab+ennemy_stab+1)
+        # Disk possesion
+        player_disk, ennemy_disk = board.count(self.disk), board.count(ennemy.disk)
 
-        # Total score
-        time = board.count("X")+board.count("O")
-        score = Board_Reversi.WEIGHT_TIME[time][0]*mobi + Board_Reversi.WEIGHT_TIME[time][1]*frontier + Board_Reversi.WEIGHT_TIME[time][2]*diff + Board_Reversi.WEIGHT_TIME[time][3]*weight + Board_Reversi.WEIGHT_TIME[time][4]*stability + Board_Reversi.WEIGHT_TIME[time][5]*corner_poss 
-        return score
-    
-    def minimax(self, player, depth, is_maximizing_player, ennemy, board):
-        """Minimax algorithm"""
+        # Possible moves
+        player_move, ennemy_move = len(self.can_play(board)), len(ennemy.can_play(board))
+
+        # Total dynamic score
+        
+        # End Game
+        if board.count(".")==0:
+            if player_disk>ennemy_disk:
+                return 1e4
+            elif player_disk<ennemy_disk:
+                return -1e4
+            else:
+                return 0
+
+        disk_count = player_disk+ennemy_disk
+        if disk_count < Board_Reversi().size**2-20:
+            t = 0
+        else:
+            t = 1
+        return (Board_Reversi().size**2+2-disk_count)*(player_corner-ennemy_corner) + (-Board_Reversi().size**2+4+disk_count)*(player_X-ennemy_X) + (-Board_Reversi().size**2+1+disk_count)*(player_C-ennemy_C) + t*(player_disk-ennemy_disk) + (player_move-ennemy_move)
+
+    def alphabeta(self, player, depth, is_maximizing_player, ennemy, board, alpha, beta):
+        """AlphaBeta Pruning algorithm"""
         pos = player.can_play(board)
         if depth == 0 or not pos:
             return player.evaluation(ennemy, board, depth)
@@ -271,14 +198,18 @@ class Player_Reversi(Game_Reversi):
             best_score = -1e14 #-inf
             for c in pos:
                 board_copy = player.play(c[0], c[1:], player.disk, True, deepcopy(board))
-                score = self.minimax(ennemy, depth-1, False, player, board_copy)
-                best_score = max(best_score, score)
+                best_score = max(best_score, self.alphabeta(ennemy, depth-1, False, player, board_copy, alpha, beta))
+                alpha = max(alpha, best_score)
+                if beta <= alpha:
+                    break # Beta cutoff
         else: # Minimize
             best_score = 1e14 # inf
             for c in pos:
                 board_copy = player.play(c[0], c[1:], player.disk, True, deepcopy(board))
-                score = self.minimax(ennemy, depth-1, True, player, board_copy)
-                best_score = min(best_score, score)
+                best_score = min(best_score, self.alphabeta(ennemy, depth-1, True, player, board_copy, alpha, beta))
+                beta = min(beta, best_score)
+                if beta <= alpha:
+                    break # Alpha cutoff
         return best_score
 
 
@@ -288,11 +219,13 @@ class Player_Reversi(Game_Reversi):
         for c in pos:
             board_copy = self.play(c[0], c[1:], self.disk, True, deepcopy(Board_Reversi.board["grille"]))
             if self.turn_n <= ((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(ennemy, 3, True, self, board_copy) # Anticipe sur 3 tours
+                score = self.alphabeta(ennemy, 5, True, self, board_copy, -1e14, 1e14) # Anticipe sur 3 tours
             elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(ennemy, 4, True, self, board_copy) # Anticipe sur 4 tours
+                score = self.alphabeta(ennemy, 7, True, self, board_copy, -1e14, 1e14) # Anticipe sur 4 tours
+            elif self.turn_n >= Board_Reversi().size**2-20: 
+                score = self.alphabeta(ennemy, 20, True, self, board_copy, -1e14, 1e14) # Anticipe jusqu'à la fin du jeu
             else: 
-                score = self.minimax(ennemy, 5, True, self, board_copy) # Anticipe sur 5 tours
+                score = self.alphabeta(ennemy, 7, True, self, board_copy, -1e14, 1e14) # Anticipe sur 6 tours
             if score > best_score:
                 best_score, best_pos = score, c
         return best_pos
