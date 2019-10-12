@@ -1,8 +1,8 @@
 # coding: utf-8
 """
 # Branch : feature-AI03
-# Description : wip Weak AI (alphabeta algorithm) #4 // AI's computation time is too long #5
-- AlphaBeta Pruning algorithm !
+# Description : wip Weak AI (alphabeta algorithm) #4
+- AlphaBeta Pruning
 # Version : 3.4.4
 """
 from copy import deepcopy
@@ -77,23 +77,23 @@ class Game_Reversi(Board_Reversi):
                 else:
                     print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
-                    while user_choice.upper() not in pos:
+                    while user_choice.upper().replace(" ", "") not in pos:
                         print "\nJouez une position legale!"
                         print Board_Reversi()
                         user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
-                    print "\n{} joue en {}!".format(player, user_choice.upper())
-                    player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
+                    print "\n{} joue en {}!".format(player, user_choice.upper().replace(" ", ""))
+                    player.play(user_choice.upper().replace(" ", "")[0], user_choice.upper().replace(" ", "")[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
             else:
                 print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                 user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
-                while user_choice.upper() not in pos:
+                while user_choice.upper(). replace(" ", "") not in pos:
                     print "\nJouez une position legale!"
                     print Board_Reversi()
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
-                print "\n{} joue en {}!".format(player, user_choice.upper())
-                player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
+                print "\n{} joue en {}!".format(player, user_choice.upper().replace(" ", ""))
+                player.play(user_choice.upper().replace(" ", "")[0], user_choice.upper().replace(" ", "")[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
         else:
