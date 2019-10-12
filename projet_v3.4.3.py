@@ -6,7 +6,7 @@
 - Parity
 - Corner possesion
 - Disk differential
-# Version : 3.4.2.4
+# Version : 3.4.3.1
 """
 from copy import deepcopy
 
@@ -23,6 +23,34 @@ class Board_Reversi(object):
             Board_Reversi.DISK, Board_Reversi.ENNEMY_DISK = "XO", {"X" : "O", "O" : "X"}
             Board_Reversi.DIRECTIONS = [(x,y) for x in range(-1,2) for y in range(-1,2) if x or y]
             # -- La section qui suit ne sert qu'à l'AI (cf. computer_pos()) --
+            Board_Reversi.WEIGHT_SET = [[8, 85, -40, 10, 210, 520],
+                                        [8, 85, -40, 10, 210, 520],
+                                        [33, -50, -15, 4, 416, 2153],
+                                        [46, -50, -1, 3, 612, 4141],
+                                        [51, -50, 62, 3, 595, 3184],
+                                        [33, -5, 66, 2, 384, 2777],
+                                        [44, 50, 163, 0, 443, 2568],
+                                        [13, 50, 66, 0, 121, 986],
+                                        [4, 50, 31, 0, 27, 192],
+                                        [8, 500, 77, 0, 36, 299]]
+            Board_Reversi.TURN_SET = [0]+[i for i in range(self.size**2-9, self.size**2)]
+            Board_Reversi.WEIGHT_TIME = {t : [None]*6 for t in range(self.size**2+1)}
+            for dc in range(self.size**2+1):
+                # détermine quel set utiliser pour un tour donné
+                w = 0
+                for i in range(len(Board_Reversi.TURN_SET)):
+                    if dc <= Board_Reversi.TURN_SET[i]:
+                        w = i
+                        break
+                # First set of weight
+                if w == 0:
+                    Board_Reversi.WEIGHT_TIME[dc] = Board_Reversi.WEIGHT_SET[0]
+                    continue
+                
+                factor = float((dc-Board_Reversi.TURN_SET[w-1]))/(Board_Reversi.TURN_SET[w]-Board_Reversi.TURN_SET[w-1])
+                for i in range(6):
+                    Board_Reversi.WEIGHT_TIME[dc][i] = int(factor*Board_Reversi.WEIGHT_SET[w][i]+(1-factor)*Board_Reversi.WEIGHT_SET[w-1][i])
+            print Board_Reversi.WEIGHT_TIME
             if self.size == 4:
                 Board_Reversi.POSITION_WEIGHT = [95, 8, 8, 95,
                                                  8, -3, -3, 8,
@@ -36,7 +64,7 @@ class Board_Reversi(object):
                                                  -3, -7, -4, -4, -7, 3,
                                                  95, -3, 11, 11, -3, 95]
             elif self.size >= 8: # On pourrait tout faire en une ligne, mais ça nuierait à la compréhension; la vitesse d'execution serait plus rapide
-                line_1 = [20, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
+                line_1 = [95, -3, 11]+[8]*((self.size-6)/2); line_1 += line_1[::-1]
                 line_2 = [-3, -7, -4]+[1]*((self.size-6)/2); line_2 += line_2[::-1]
                 line_3 = [11, -4, 2]+[2]*((self.size-6)/2); line_3 += line_3[::-1]
                 line_middle = [8, 1, 2]+[-3]*((self.size-6)/2); line_middle += line_middle[::-1]; line_middle += line_middle*((self.size-8)/2)
