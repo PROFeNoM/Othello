@@ -201,7 +201,8 @@ class Player_Reversi(Game_Reversi):
         CORNER = ["A1", chr(ord("A")+Board_Reversi().size-1)+"1", "A"+str(Board_Reversi().size), chr(ord("A")+Board_Reversi().size-1)+str(Board_Reversi().size)]
         
         # Mobility
-        player_mobi, ennemy_mobi = len(self.can_play(board)), len(ennemy.can_play(board))
+        player_m = self.can_play(board)
+        player_mobi, ennemy_mobi = len(player_m), len(ennemy.can_play(board))
         mobi = (100.*(player_mobi-ennemy_mobi))/(player_mobi+ennemy_mobi+1)
 
         # Poids du joueur : somme des points correspondant à l'emplacement des jetons
@@ -228,11 +229,11 @@ class Player_Reversi(Game_Reversi):
         # parity = -1 if (Board_Reversi().size**2-(player_disk+ennemy_disk))%2 == 0 else 1
 
         # Corner possesion
-        if (board[Board_Reversi.POS[CORNER[0]]]==self.disk) or (board[Board_Reversi.POS[CORNER[1]]]==self.disk) or (board[Board_Reversi.POS[CORNER[2]]]==self.disk) or (board[Board_Reversi.POS[CORNER[3]]]==self.disk):
-            corner_poss = 100
-        else:
-            corner_poss = 0
-            
+        corner_poss = 0
+        for m in player_m:
+            if m in CORNER:
+                corner_poss += 100
+
         # Stability
         player_stab, ennemy_stab = 0, 0
         for i in range(4):
