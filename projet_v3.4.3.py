@@ -202,6 +202,7 @@ class Player_Reversi(Game_Reversi):
                 alpha = max(alpha, best_score)
                 if beta <= alpha:
                     break # Beta cutoff
+            return best_score
         else: # Minimize
             best_score = 1e14 # inf
             for c in pos:
@@ -210,7 +211,7 @@ class Player_Reversi(Game_Reversi):
                 beta = min(beta, best_score)
                 if beta <= alpha:
                     break # Alpha cutoff
-        return best_score
+            return best_score
 
 
     def computer_pos(self, pos, ennemy):
@@ -219,13 +220,13 @@ class Player_Reversi(Game_Reversi):
         for c in pos:
             board_copy = self.play(c[0], c[1:], self.disk, True, deepcopy(Board_Reversi.board["grille"]))
             if self.turn_n <= ((Board_Reversi().size)**2-4)/3:
-                score = self.alphabeta(ennemy, 5, True, self, board_copy, -1e14, 1e14) # Anticipe sur 3 tours
+                score = self.alphabeta(ennemy, 3, False, self, board_copy, -1e14, 1e14) # Anticipe sur 3 tours
             elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3:
-                score = self.alphabeta(ennemy, 7, True, self, board_copy, -1e14, 1e14) # Anticipe sur 4 tours
+                score = self.alphabeta(ennemy, 5, False, self, board_copy, -1e14, 1e14) # Anticipe sur 5 tours
             elif self.turn_n >= Board_Reversi().size**2-20: 
-                score = self.alphabeta(ennemy, 20, True, self, board_copy, -1e14, 1e14) # Anticipe jusqu'à la fin du jeu
+                score = self.alphabeta(ennemy, 19, False, self, board_copy, -1e14, 1e14) # Anticipe jusqu'à la fin du jeu
             else: 
-                score = self.alphabeta(ennemy, 7, True, self, board_copy, -1e14, 1e14) # Anticipe sur 6 tours
+                score = self.alphabeta(ennemy, 7, False, self, board_copy, -1e14, 1e14) # Anticipe sur 7 tours
             if score > best_score:
                 best_score, best_pos = score, c
         return best_pos
