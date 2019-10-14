@@ -1,13 +1,9 @@
 # coding: utf-8
 """
 # Branch : feature-AI03
-# Description : wip Weak AI (Minimax algorithm) #4
-- Corner 
-- X Squares
-- C Squares
-- Disk Differential
-- Mobility
-# Version : 3.4.3.3
+# Description : wip Weak AI (alphabeta algorithm) #4
+- AlphaBeta Pruning
+# Version : 3.4.4
 """
 from copy import deepcopy
 
@@ -45,7 +41,7 @@ class Board_Reversi(object):
     @staticmethod
     def place(column, row, disk, board=None):
         """Place un disque ("O" ou "X") a l'emplacement"""
-        if board: # Minimax algorithm
+        if board: # alphabeta algorithm
             board[Board_Reversi.POS[column+row]] = disk
         else:
             Board_Reversi.board["grille"][Board_Reversi.POS[column+row]] = disk
@@ -81,23 +77,23 @@ class Game_Reversi(Board_Reversi):
                 else:
                     print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
-                    while user_choice.upper() not in pos:
+                    while user_choice.upper().replace(" ", "") not in pos:
                         print "\nJouez une position legale!"
                         print Board_Reversi()
                         user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
-                    print "\n{} joue en {}!".format(player, user_choice.upper())
-                    player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
+                    print "\n{} joue en {}!".format(player, user_choice.upper().replace(" ", ""))
+                    player.play(user_choice.upper().replace(" ", "")[0], user_choice.upper().replace(" ", "")[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
             else:
                 print "\n{}, c'est ton tour! ({})".format(player, player.disk)
                 user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
-                while user_choice.upper() not in pos:
+                while user_choice.upper(). replace(" ", "") not in pos:
                     print "\nJouez une position legale!"
                     print Board_Reversi()
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
-                print "\n{} joue en {}!".format(player, user_choice.upper())
-                player.play(user_choice[0].upper(), user_choice[1:], player.disk, True)
+                print "\n{} joue en {}!".format(player, user_choice.upper().replace(" ", ""))
+                player.play(user_choice.upper().replace(" ", "")[0], user_choice.upper().replace(" ", "")[1:], player.disk, True)
                 self.change_turn()
                 self.turn_n += 1
         else:
@@ -120,7 +116,7 @@ class Player_Reversi(Game_Reversi):
         """Renvoie la liste des positions légales de jeu pour le joueur"""
         return [c+str(r) for c in [chr(i) for i in range(ord("A"), ord("A")+Board_Reversi().size)] for r in range(1,Board_Reversi().size+1) if self.play(c, str(r), self.disk, False, board)]
 
-    def play(self, column, row, disk, swap=False, board=None): # (Board is not None) seulement w/ Minimax
+    def play(self, column, row, disk, swap=False, board=None): # (Board is not None) seulement w/ alphabeta
         """Determine si un coup est legal ou non"""
         if self.spot(column, row, board) is not ".": # L'emplacement est deja occupe
             return False
@@ -139,11 +135,11 @@ class Player_Reversi(Game_Reversi):
                     self.place(self.POS[c_swap], str(r_swap), self.disk, board)
                     c_swap += dc
                     r_swap += dr
-                if not board: # On change le tour si on utlise pas Minimax
+                if not board: # On change le tour si on utlise pas alphabeta
                     self.change_turn()
             else:
                 return True # Dans cette direction, un emplacement est donc disponible
-        if board and swap: # Pour minimax uniquement, on renvoie l'etat du plateau actuel seulement lorsque l'on change les pieces
+        if board and swap: # Pour alphabeta uniquement, on renvoie l'etat du plateau actuel seulement lorsque l'on change les pieces
             return board
         return False # Dans toutes directions, il n'y a aucun enplacement
         
@@ -193,8 +189,8 @@ class Player_Reversi(Game_Reversi):
             t = 1
         return (Board_Reversi().size**2+2-disk_count)*(player_corner-ennemy_corner) + (-Board_Reversi().size**2+4+disk_count)*(player_X-ennemy_X) + (-Board_Reversi().size**2+1+disk_count)*(player_C-ennemy_C) + t*(player_disk-ennemy_disk) + (player_move-ennemy_move)
 
-    def minimax(self, player, depth, is_maximizing_player, ennemy, board):
-        """Minimax algorithm"""
+    def alphabeta(self, player, depth, is_maximizing_player, ennemy, board, alpha, beta):
+        """AlphaBeta Pruning algorithm"""
         pos = player.can_play(board)
         if depth == 0 or not pos:
             return player.evaluation(ennemy, board, depth)
@@ -202,15 +198,20 @@ class Player_Reversi(Game_Reversi):
             best_score = -1e14 #-inf
             for c in pos:
                 board_copy = player.play(c[0], c[1:], player.disk, True, deepcopy(board))
-                score = self.minimax(ennemy, depth-1, False, player, board_copy)
-                best_score = max(best_score, score)
+                best_score = max(best_score, self.alphabeta(ennemy, depth-1, False, player, board_copy, alpha, beta))
+                alpha = max(alpha, best_score)
+                if beta <= alpha:
+                    break # Beta cutoff
+            return best_score
         else: # Minimize
             best_score = 1e14 # inf
             for c in pos:
                 board_copy = player.play(c[0], c[1:], player.disk, True, deepcopy(board))
-                score = self.minimax(ennemy, depth-1, True, player, board_copy)
-                best_score = min(best_score, score)
-        return best_score
+                best_score = min(best_score, self.alphabeta(ennemy, depth-1, True, player, board_copy, alpha, beta))
+                beta = min(beta, best_score)
+                if beta <= alpha:
+                    break # Alpha cutoff
+            return best_score
 
 
     def computer_pos(self, pos, ennemy):
@@ -219,13 +220,13 @@ class Player_Reversi(Game_Reversi):
         for c in pos:
             board_copy = self.play(c[0], c[1:], self.disk, True, deepcopy(Board_Reversi.board["grille"]))
             if self.turn_n <= ((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(ennemy, 3, True, self, board_copy) # Anticipe sur 3 tours
+                score = self.alphabeta(ennemy, 3, False, self, board_copy, -1e14, 1e14) # Anticipe sur 3 tours
             elif self.turn_n <= 2*((Board_Reversi().size)**2-4)/3:
-                score = self.minimax(ennemy, 4, True, self, board_copy) # Anticipe sur 4 tours
+                score = self.alphabeta(ennemy, 5, False, self, board_copy, -1e14, 1e14) # Anticipe sur 5 tours
             elif self.turn_n >= Board_Reversi().size**2-20: 
-                score = self.minimax(ennemy, 20, True, self, board_copy) # Anticipe jusqu'à la fin du jeu
+                score = self.alphabeta(ennemy, 19, False, self, board_copy, -1e14, 1e14) # Anticipe jusqu'à la fin du jeu
             else: 
-                score = self.minimax(ennemy, 6, True, self, board_copy) # Anticipe sur 6 tours
+                score = self.alphabeta(ennemy, 7, False, self, board_copy, -1e14, 1e14) # Anticipe sur 7 tours
             if score > best_score:
                 best_score, best_pos = score, c
         return best_pos
