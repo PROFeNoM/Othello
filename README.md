@@ -18,7 +18,7 @@ Result:
 ==> Aborted
 
 ### feature-AI03
-Implementation of the Minimax algorithm with a dynamic heuristic function  
+Implementation of the ~~Minimax~~ AlphaBeta pruning algorithm with a dynamic heuristic function  
 Result: ***TBA***
 
 ## Various Size Board
