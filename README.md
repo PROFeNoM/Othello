@@ -19,7 +19,8 @@ Result:
 
 ### feature-AI03
 Implementation of the ~~Minimax~~ AlphaBeta pruning algorithm with a dynamic heuristic function  
-Result: ***TBA***
+Result: 
+- 8x8 : **100%** WR against random pos AI !
 
 ## Various Size Board
 ### feature-VB01 
