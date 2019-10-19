@@ -68,11 +68,18 @@ def main():
         else:
             player_O = HumanPlayer("O", name)
             player_X = RandomPlayer("X")
-        print "\nPour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
-        game, over = GameEngine(player_X, player_O, user_choice_size), False
-        while not over:
-            over = game.game_loop()
-        winner(player_X, player_O, over[0], over[1], over[2], user_choice_size)
+    else:
+        names = list()
+        for i in range(user_choice_gm):
+            names.append(raw_input("Entrez le nom du joueur {} ({disk}): ".format(i+1, disk="X" if i==0 else "O")))
+        player_X = HumanPlayer("X", names[0])
+        player_O = HumanPlayer("O", names[1])
+    print "\nPour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
+    game, over = GameEngine(player_X, player_O, user_choice_size), False
+    while not over:
+        over = game.game_loop()
+    winner(player_X, player_O, over[0], over[1], over[2], user_choice_size)
+
 
 main()
 

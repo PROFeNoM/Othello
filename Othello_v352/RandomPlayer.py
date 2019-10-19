@@ -9,7 +9,7 @@ from random import shuffle
 class RandomPlayer(object):
     """A Random AI"""
 
-    def __init__(self, disk, name="computer"):
+    def __init__(self, disk, name="L'ordinateur"):
         """
         Initialize player's disk and name
         :param disk: either "X" or "O"

@@ -17,7 +17,7 @@ class Board(object):
         
     def __str__(self):
         """Affiche l'etat du plateau de jeu"""
-        return "~~~~ Plateau de Jeu ~~~~\n" + "    "+ " ".join(self.c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE]) for row, i in enumerate([n*self.SIZE for n in range(self.SIZE)])]) + "\n~~~~~~~~~~~~~~~~~~~~~~~~"
+        return "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(self.c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE]) for row, i in enumerate([n*self.SIZE for n in range(self.SIZE)])])
 
     def spot(self, column, row):
         """
@@ -46,7 +46,7 @@ class Board(object):
         self.board["grille"][self.c.POSITION[column+row]] = disk
 
     def starting_board(self):
-        print self.SIZE
+        print "\nFormat du plateau choisit: {}x{}".format(self.SIZE, self.SIZE)
         for pos, disk in zip([self.c.POSITION[key] for key in (self.c.NUM_COL[self.SIZE/2 - 1] + str(self.SIZE/2), self.c.NUM_COL[self.SIZE/2] + str(self.SIZE/2 + 1), self.c.NUM_COL[self.SIZE/2 - 1] + str(self.SIZE/2 + 1), self.c.NUM_COL[self.SIZE/2] + str(self.SIZE/2))], "OOXX"): # Initial 4 positions
             self.board["grille"][pos] = disk
 

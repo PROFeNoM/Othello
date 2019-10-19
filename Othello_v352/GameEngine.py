@@ -30,10 +30,10 @@ class Score(object):
 
     def display_score(self):
         """Print the scoreboard, which include both player's score."""
-        print "~~~~ ScoreBoard ~~~~"
+        print "\n~~~~   ScoreBoard   ~~~~"
         print self.black_name + " (X): " + str(self.black_score)
         print self.white_name + " (O): " + str(self.white_score)
-        print "~~~~~~~~~~~~~~~~~~~~"
+        print "~~~~~~~~~~~~~~~~~~~~~~~~"
     
 class Turn(object):
     """Keep track of game's turn number and player."""
@@ -54,7 +54,7 @@ class Turn(object):
         return self.player
 
     def display_turn(self):
-        print "~~~~~ TOUR %s ~~~~~" % self.turn
+        print "\n~~~~     TOUR %s     ~~~~" % self.turn
 
 class GameEngine(object):
     """An Othello Game"""
@@ -114,8 +114,6 @@ class GameEngine(object):
         """Main game loop"""
         over = False 
         while not over:
-            print over
-            print not over
             player = self.turn.get_player()
             over = self.game(player)
         return over
