@@ -19,7 +19,10 @@ Result:
 
 ### feature-AI03
 Implementation of the ~~Minimax~~ AlphaBeta pruning algorithm with a dynamic heuristic function  
-Result: ***TBA***
+Result for *100 games*:  
+- 4x4 : **97%** WR against random pos AI
+- 6x6 : **100%** WR against random pos AI !
+- 8x8 : **100%** WR against random pos AI !
 
 ## Various Size Board
 ### feature-VB01 
@@ -29,5 +32,5 @@ Change the whole project so it can handle a various-size board (v3.1)
 ### feature-REC01  
 Increased readability, clearness and efficiency of the code (v3.2)
 
-### feature-REC02 - [***W.I.P.***]
+### feature-REC02
 Multiple file organization
