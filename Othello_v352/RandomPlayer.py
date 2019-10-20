@@ -4,7 +4,8 @@ Authors :
 Date :
 Description :
     Contains an AI returning a random
-    position.
+    position. This type of file is more
+    usefull for more complex AI as AlphaBeta.
 """
 from random import shuffle
 
