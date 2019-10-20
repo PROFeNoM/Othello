@@ -32,5 +32,5 @@ Change the whole project so it can handle a various-size board (v3.1)
 ### feature-REC01  
 Increased readability, clearness and efficiency of the code (v3.2)
 
-### feature-REC02 - [***W.I.P.***]
+### feature-REC02
 Multiple file organization
