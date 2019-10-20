@@ -3,6 +3,9 @@ Filename : GameEngine.py
 Authors : 
 Date :
 Description :
+    Contains the scoreboard and the progress of the game.
+    Also contains the main engine to play, hence allowing
+    to play a turn the good way.
 """
 
 from HumanPlayer import HumanPlayer
@@ -15,9 +18,12 @@ class Score(object):
     """Scoreboard of the game."""
 
     def __init__(self, player_X, player_O):
-        """Both player's score is 2 at game's start."""
+        """
+        Both player's score is 2 at game's start.
+        :param player_X: Player who's playing with X disks
+        :param player_O: Player who's playing with O disks"""
         self.black_score, self.white_score = 2, 2
-        self.black_name, self.white_name = player_X.disk, player_O.disk
+        self.black_name, self.white_name = player_X.name, player_O.name
         
 
     def update_score(self, black, white):
@@ -39,7 +45,11 @@ class Turn(object):
     """Keep track of game's turn number and player."""
     
     def __init__(self, player_X, player_O):
-        """First player to play is Black (X)."""
+        """
+        First player to play is Black (X).
+        :param player_X: Player who's playing with X disks
+        :param player_O: Player who's playing with O disks
+        """
         self.player_X = player_X
         self.player_O = player_O
         self.player = player_X
@@ -54,13 +64,19 @@ class Turn(object):
         return self.player
 
     def display_turn(self):
-        print "\n~~~~     TOUR %s     ~~~~" % self.turn
+        print "\n~~~~     TOUR %d     ~~~~" % self.turn
 
 class GameEngine(object):
     """An Othello Game"""
     over = 0 # If over is 2, then it means that for two turn in a row no one played. Game over.
 
     def __init__(self, player_X, player_O, SIZE):
+        """
+        Define game caracteristics
+        :param player_X: Player who's playing with X disks
+        :param player_O: Player who's playing with O disks
+        :param SIZE: Board's size
+        """
         self.player_X = player_X
         self.player_O = player_O
         self.scoreboard = Score(player_X, player_O)
@@ -72,13 +88,11 @@ class GameEngine(object):
     def game(self, player):
         """
         A turn logic.
-        :param AI: If True, the player is playing against the computer.
+        :param player: Player who's playing this turn.
         """
-
         if self.over == 2 or not "." in self.board.board["grille"]: # Game Over
             print "\n\tGrille finale:\n"
             print self.board
-            
             return (self.board.get_score(self.player_X), self.board.get_score(self.player_O), self.board.empty_squares())
         self.turn.display_turn()
         print self.board
@@ -88,22 +102,18 @@ class GameEngine(object):
             self.over = 0
             if type(player) is HumanPlayer:
                 print "\n{}, c'est ton tour! ({})".format(player.name, player.disk)
-                user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ")
-                while user_choice.upper().replace(" ", "") not in valid_moves:
+                user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ").upper().replace(" ", "")
+                while user_choice not in valid_moves:
                     print "\nJouez une position legale!"
                     print self.board
-                    user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ")
-                print "\n{} joue en {}!".format(player.name, user_choice.upper().replace(" ", ""))
-                self.player_engine.play(user_choice.upper().replace(" ", "")[0], user_choice.upper().replace(" ", "")[1:], player, True)
-                self.turn.change_turn()
-                self.scoreboard.update_score(self.board.get_score(self.player_X), self.board.get_score(self.player_O))
+                    user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ").upper().replace(" ", "")
             else: # AIPlayer
                 print "\nC'est le tour de l'ordinateur. ({})".format(player.disk)
-                move = player.get_move(valid_moves)
-                print "\nL'ordinateur joue en {}".format(move)
-                self.player_engine.play(move[0], move[1:], player, True)
-                self.turn.change_turn()
-                self.scoreboard.update_score(self.board.get_score(self.player_X), self.board.get_score(self.player_O))    
+                user_choice = player.get_move(valid_moves)
+            print "\n{} joue en {}".format(player.name, user_choice)
+            self.player_engine.play(user_choice[0], user_choice[1:], player, True)
+            self.turn.change_turn()
+            self.scoreboard.update_score(self.board.get_score(self.player_X), self.board.get_score(self.player_O))    
         else:
             self.over += 1
             self.turn.change_turn()

@@ -3,6 +3,8 @@ Filename : HumanPlayer.py
 Authors : 
 Date :
 Description :
+    This is simply a human player and 
+    its caracteristics.
 """
 
 class HumanPlayer(object):

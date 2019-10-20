@@ -11,7 +11,12 @@ from HumanPlayer import HumanPlayer
 from RandomPlayer import RandomPlayer
 
 def ask_number(question, low, high):
-    """Ask for a number within a range."""
+    """
+    Ask for a number within a range.
+    :param question: Sentence to display to the player
+    :param low: lowest legal value
+    :param high: highest legal value
+    """
     res = None
     while res not in range(low,high+1):
         try:
@@ -23,7 +28,15 @@ def ask_number(question, low, high):
     return res
 
 def winner(player_X, player_O, score_pX, score_pO, empty, size):
-    """Determine and display both the winner and loser of the game"""
+    """
+    Determine and display both the winner and loser of the game
+    :param player_X: Player who's playing with X disks
+    :param player_O: Player who's playing with O disks
+    :param score_pX: Score of the player with X disks
+    :param score_pO: Score of the player with O disks
+    :param empty: Number of empty squares left on the board
+    :param size: Board's size
+    """
     if empty:
         if score_pX > score_pO:
             score_pX += empty
@@ -79,7 +92,6 @@ def main():
     while not over:
         over = game.game_loop()
     winner(player_X, player_O, over[0], over[1], over[2], user_choice_size)
-
 
 main()
 

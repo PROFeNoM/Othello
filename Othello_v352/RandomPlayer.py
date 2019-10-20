@@ -1,8 +1,10 @@
 """
-Filename : GameEngine.py
+Filename : RandomPlayer.py
 Authors : 
 Date :
 Description :
+    Contains an AI returning a random
+    position.
 """
 from random import shuffle
 

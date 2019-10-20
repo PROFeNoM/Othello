@@ -1,8 +1,11 @@
 """
-Filename : GameEngine.py
+Filename : GamePlayer.py
 Authors : 
 Date :
 Description :
+    Contains what the game engine needs to see whether
+    or not a player can play, where and change the board
+    according to player's decision.
 """
 from Constant import Constant
 
@@ -10,6 +13,11 @@ class PlayerEngine(object):
     """Everything a Player is able to do to interact with the board"""
 
     def __init__(self, board, SIZE):
+        """
+        Utility of PlayerEngine
+        :param board: The board we are playing with
+        :param SIZE: board's size
+        """
         self.board = board
         self.c = Constant(SIZE)
         

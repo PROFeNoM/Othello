@@ -3,14 +3,18 @@ Filename : Board.py
 Authors : 
 Date :
 Description :
+    Contains everything relative to an
+    Othello board and its state.
 """
 from Constant import Constant
 
 class Board(object):
     """Othello board information"""
-    
 
     def __init__(self, SIZE):
+        """
+        The board is caracterized by his size
+        :param SIZE: Board's size"""
         self.SIZE = SIZE
         self.c = Constant(SIZE)
         self.board = {"d" : SIZE, "grille": ['.']*(SIZE**2)}
@@ -29,10 +33,18 @@ class Board(object):
         return self.board["grille"][self.c.POSITION[column+row]] 
     
     def is_on_board(self, column, row):
-        """Retoune True si l'emplacement est le plateau, False sinon"""
+        """
+        Retoune True si l'emplacement est le plateau, False sinon
+        :param column: Column of the position
+        :param row: Row of the position
+        """
         return (0<=column<=self.SIZE-1 and 1<=row<=self.SIZE) 
 
     def get_score(self, player):
+        """
+        Return the number of disk(s) a player has
+        :param player: Player we want to know the number of disk(s)
+        """
         return self.board["grille"].count(player.disk)
 
     def place(self, column, row, disk):
