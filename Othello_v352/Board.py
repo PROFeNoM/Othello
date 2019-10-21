@@ -13,7 +13,7 @@ class Board(object):
 
     def __init__(self, SIZE):
         """
-        The board is caracterized by his size
+        The board is caracterized by its size
         :param SIZE: Board's size"""
         self.SIZE = SIZE
         self.c = Constant(SIZE)
