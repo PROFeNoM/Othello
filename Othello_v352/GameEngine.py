@@ -129,4 +129,33 @@ class GameEngine(object):
         return over
 
 if __name__ == "__main__":
-    pass
+    player_X = HumanPlayer("X", "Alex")
+    player_O = HumanPlayer("O", "jean")
+
+    Score = Score(player_X,player_O)
+    Score.update_score(42, 65)
+
+    if Score.black_score == 42 and Score.white_score == 65:
+        print "ok"
+
+    Turn = Turn(player_X, player_O)
+
+    Turn.turn = 65
+    Turn.player = player_O
+    Turn.change_turn()
+    if Turn.player == player_X and Turn.turn == 66:
+        print "ok"
+
+    Turn.turn = 5
+    Turn.player = player_X
+    Turn.change_turn()
+    if Turn.player == player_O and Turn.turn == 6:
+        print "ok"
+
+    Turn.player = player_O
+    if Turn.get_player() == player_O:
+        print "ok"
+    
+    urn.player = player_X
+    if Turn.get_player() == player_X:
+        print "ok"

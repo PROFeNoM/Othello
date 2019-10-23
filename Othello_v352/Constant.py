@@ -53,5 +53,5 @@ class Constant(object):
 
 
 if __name__ == "__main__":
-    constant = Constant(4)
-    print constant.POSITION
+    Constant = Constant(4)
+    print Constant.POSITION

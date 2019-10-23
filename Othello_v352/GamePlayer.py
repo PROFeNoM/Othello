@@ -15,7 +15,7 @@ class PlayerEngine(object):
     def __init__(self, board, SIZE):
         """
         Utility of PlayerEngine
-        :param board: The board we are playing with
+        :param board: The board (class) we are playing with
         :param SIZE: board's size
         """
         self.board = board
@@ -62,4 +62,14 @@ class PlayerEngine(object):
         return [c+str(r) for c in self.c.COL for r in self.c.RW if self.play(c, str(r), player, False)]
 
 if __name__ == "__main__":
-    pass
+    from Board import Board
+    from HumanPlayer import HumanPlayer
+    SIZE = 2
+    Board=Board(SIZE)
+    player_X = HumanPlayer("X", "Alex")
+    player_O = HumanPlayer("O", "jean")
+    PlayerEngine = PlayerEngine(Board, SIZE)
+
+    if PlayerEngine.get_moves(player_X) == []:
+        print "ok"
+

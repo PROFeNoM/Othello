@@ -28,3 +28,8 @@ class RandomPlayer(object):
         """
         shuffle(moves)
         return moves[0]
+
+if __name__ =="__main__":
+    RandomPlayer = RandomPlayer("X")
+    if RandomPlayer.disk == "X":
+        print "--> Test ok"
