@@ -60,11 +60,12 @@ class Board(object):
         self.board["grille"][self.c.POSITION[column+row]] = disk
 
     def starting_board(self):
-        print "\nFormat du plateau choisit: {}x{}".format(self.SIZE, self.SIZE)
+        """Place the first 4 starting pieces of an Othello game."""
         for pos, disk in zip([self.c.POSITION[key] for key in (self.c.NUM_COL[self.SIZE/2 - 1] + str(self.SIZE/2), self.c.NUM_COL[self.SIZE/2] + str(self.SIZE/2 + 1), self.c.NUM_COL[self.SIZE/2 - 1] + str(self.SIZE/2 + 1), self.c.NUM_COL[self.SIZE/2] + str(self.SIZE/2))], "OOXX"): # Initial 4 positions
             self.board["grille"][pos] = disk
 
     def empty_squares(self):
+        """Determine how much empty squares are left on the board."""
         return self.board["grille"].count(".")
 
 if __name__ == "__main__":

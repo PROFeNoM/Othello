@@ -124,7 +124,7 @@ class GameEngine(object):
             self.scoreboard.update_score(self.board.get_score(self.player_X), self.board.get_score(self.player_O))    
         else:
             self.over += 1
-            self.turn.change_turn()
+            self.turn.change_turn(False)
             print "{} ne peut pas jouer de position legale.".format(player.name)
         return False # Game continues
 

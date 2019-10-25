@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 Filename : Constant.py
 Authors : 
