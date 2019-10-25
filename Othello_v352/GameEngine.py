@@ -1,3 +1,5 @@
+# coding: utf-8
+ 
 """
 Filename : GameEngine.py
 Authors : 
@@ -55,9 +57,15 @@ class Turn(object):
         self.player = player_X
         self.turn = 1
     
-    def change_turn(self):
+    def change_turn(self, did_play=True):
+        """
+        Change the actual player and the turn number
+        :param did_play: Either True or False. If false, it means the last player wasn't able to play.
+        Therefore, we don't increase the turn number
+        """
         self.player = self.player_X if self.player==self.player_O else self.player_O
-        self.turn += 1
+        if did_play:
+            self.turn += 1
 
     def get_player(self):
         """Return the player who is playing"""
@@ -129,33 +137,87 @@ class GameEngine(object):
         return over
 
 if __name__ == "__main__":
-    player_X = HumanPlayer("X", "Alex")
-    player_O = HumanPlayer("O", "jean")
-
+    player_X = HumanPlayer("X", "Marshall Bruce Mathers III")
+    player_O = HumanPlayer("O", "Lesane Parish Crooks")
     Score = Score(player_X,player_O)
+
+    print "\nTest de Score.update_score() :"
+    
+    # Test en changeant le score de X à 42 et celui de O à 65
     Score.update_score(42, 65)
-
     if Score.black_score == 42 and Score.white_score == 65:
-        print "ok"
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nScore.update_score({},{}) => Score X : {} // Score O : {} \nResultat attendu = Score X : {} // Score O : {}".format(42, 65, Score.black_score, Score.white_score, 42, 65)
+    print " ---> test {}".format(test)
+    
+    # Test en changeant le score de X à 2 et celui de O à 32
+    Score.update_score(2, 32)
+    if Score.black_score == 2 and Score.white_score == 32:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nScore.update_score({},{}) => Score X : {} // Score O : {} \nResultat attendu = Score X : {} // Score O : {}".format(2, 32, Score.black_score, Score.white_score, 2, 32)
+    print " ---> test {}".format(test)
 
+    print "\n-----------------------------------------"
+    
     Turn = Turn(player_X, player_O)
+    
+    print "\nTest de Test.change_turn() :"
 
+    # Test au tour 65 ayant pour joueur O
     Turn.turn = 65
     Turn.player = player_O
     Turn.change_turn()
     if Turn.player == player_X and Turn.turn == 66:
-        print "ok"
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nTurn.change_turn() ==> Joueur du tour {}: {} \nResultat attendu = Joueur du tour {}: {}".format(Turn.turn, Turn.player, 66, player_X)
+    print " ---> test {}".format(test)
 
+    # Test au tour 5 ayant pour joueur X MAIS ne pouvant pas jouer (On ne change pas le nombre de tour actuel)
     Turn.turn = 5
     Turn.player = player_X
-    Turn.change_turn()
-    if Turn.player == player_O and Turn.turn == 6:
-        print "ok"
+    Turn.change_turn(False)
+    if Turn.player == player_O and Turn.turn == 5:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nTurn.change_turn() ==> Joueur du tour {}: {} \nResultat attendu = Joueur du tour {}: {}".format(Turn.turn, Turn.player, 5, player_O)
+    print " ---> test {}".format(test)
 
-    Turn.player = player_O
-    if Turn.get_player() == player_O:
-        print "ok"
+    print "\n-----------------------------------------"
+
+    print "\nTest de Test.get_player() :"
     
-    urn.player = player_X
-    if Turn.get_player() == player_X:
-        print "ok"
+    # Test avec pour joueur O
+    Turn.player = player_O
+    res = Turn.get_player()
+    if res == player_O:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nTurn.get_player() = {} ; Resultat attendu = {}".format(res, player_O)
+    print " ---> test {}".format(test)
+
+    # Test avec pour joueur X
+    Turn.player = player_X
+    res = Turn.get_player()
+    if res == player_X:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nTurn.get_player() = {} ; Resultat attendu = {}".format(res, player_X)
+    print " ---> test {}".format(test)
+
+    print "\n-----------------------------------------"
+
+    print "\nPour tester les fonctions de la classe GameEngine, le mieux est de jouer des parties!"
+
+    try:
+        input("\n\n<Appuyez sur Enter pour quitter.>")
+    except:
+        pass
