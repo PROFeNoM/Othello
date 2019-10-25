@@ -61,7 +61,7 @@ class Turn(object):
         """
         Change the actual player and the turn number
         :param did_play: Either True or False. If false, it means the last player wasn't able to play.
-        Therefore, we don't increase the turn number
+        Therefore, we don't increase the turn number, and the final maximum number of turn is size_board**2
         """
         self.player = self.player_X if self.player==self.player_O else self.player_O
         if did_play:
