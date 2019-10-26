@@ -140,3 +140,8 @@ if __name__ == "__main__":
         test = "NOK"
     print "\nconstant_8.NUM_COL = {} \nResultat attendu = {}".format(res, expected)
     print " ---> test {}".format(test)
+
+    try:
+        input("\n\n<Appuyez sur Enter pour quitter.>")
+    except:
+        pass
