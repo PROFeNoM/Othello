@@ -1,3 +1,5 @@
+# coding: utf-8
+ 
 """
 Filename : Othello.py
 Authors : 
@@ -88,6 +90,7 @@ def main():
         player_X = HumanPlayer("X", names[0])
         player_O = HumanPlayer("O", names[1])
     print "\nPour jouer une position, saisissez les coordonnees sous la forme ColonneLigne (A4, B6, ...)"
+    print "\nFormat du plateau choisit: {}x{}".format(user_choice_size, user_choice_size)
     game, over = GameEngine(player_X, player_O, user_choice_size), False
     while not over:
         over = game.game_loop()
