@@ -34,3 +34,7 @@ Increased readability, clearness and efficiency of the code (v3.2)
 
 ### feature-REC02
 Multiple file organization
+
+## Test  
+### feature-T01
+Test of multiple functions
