@@ -23,7 +23,7 @@ class Board(object):
         
     def __str__(self):
         """Affiche l'etat du plateau de jeu"""
-        return "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(self.c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE]) for row, i in enumerate([n*self.SIZE for n in range(self.SIZE)])])
+        return "    "+ " ".join(self.c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(self.board["grille"][i:i+self.SIZE]) for row, i in enumerate([n*self.SIZE for n in range(self.SIZE)])])
 
     def spot(self, column, row):
         """
@@ -76,11 +76,11 @@ if __name__ == "__main__":
     c = Constant(SIZE)
     board_12 = Board(SIZE)
     empty_board = ["."]*(SIZE**2)
-    if board_12.__str__() == "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(empty_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(empty_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
+    if board_12.__str__() == "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(empty_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(empty_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
         test = "OK"
     else:
         test = "NOK"
-    print "\nboard_12.__str__() = \n{} \nResultat attendu = \n{}".format(board_12, "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(empty_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(empty_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
+    print "\nboard_12.__str__() = \n{} \nResultat attendu = \n{}".format(board_12, "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(empty_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(empty_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
     print " ---> test {}".format(test)
 
     # Test avec un plateau plein 2x2 (positions initiales)
@@ -89,11 +89,11 @@ if __name__ == "__main__":
     board_2 = Board(SIZE)
     board_2.board["grille"] = ["O", "X", "X", "O"]
     filled_board = ["O", "X", "X", "O"]
-    if board_2.__str__() == "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(filled_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(filled_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
+    if board_2.__str__() == "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(filled_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(filled_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
         test = "OK"
     else:
         test = "NOK"
-    print "\nboard_2.__str__() = \n{} \nResultat attendu = \n{}".format(board_2, "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(filled_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(filled_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
+    print "\nboard_2.__str__() = \n{} \nResultat attendu = \n{}".format(board_2, "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(filled_board[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(filled_board[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
     print " ---> test {}".format(test)
     
     
@@ -103,11 +103,11 @@ if __name__ == "__main__":
     board_8 = Board(SIZE)
     board_8.board["grille"] = ['X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'X']
     board_state = ['X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X', 'O', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'X']
-    if board_8.__str__() == "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(board_state[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(board_state[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
+    if board_8.__str__() == "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(board_state[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(board_state[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]):
         test = "OK"
     else:
         test = "NOK"
-    print "\nboard_8.__str__() = \n{} \nResultat attendu = \n{}".format(board_8, "~~~~ Plateau de Jeu ~~~~\n\n" + "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(board_state[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(board_state[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
+    print "\nboard_8.__str__() = \n{} \nResultat attendu = \n{}".format(board_8, "    "+ " ".join(c.COL) + "\n" +"\n".join([(" "+str(row+1)+"  "+" ".join(board_state[i:i+SIZE])) if row+1<10 else str(row+1)+"  "+" ".join(board_state[i:i+SIZE]) for row, i in enumerate([n*SIZE for n in range(SIZE)])]))
     print " ---> test {}".format(test)
     
     print "\n-----------------------------------------"

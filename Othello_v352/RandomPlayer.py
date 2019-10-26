@@ -36,7 +36,7 @@ if __name__ =="__main__":
 
     print "Test de RandomPlayer.get_move() :"
     # Pour info, le paramètre moves ne sera jamais [] en raison d'une condition en amont
-    # à la ligne 109 de GameEngine.py
+    # à la ligne 111 de GameEngine.py
 
     # Test à partir d'un plateau 8x8 initial
     from GamePlayer import PlayerEngine

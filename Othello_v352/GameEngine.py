@@ -72,6 +72,7 @@ class Turn(object):
         return self.player
 
     def display_turn(self):
+        """"Display the turn number a nice way."""
         print "\n~~~~     TOUR %d     ~~~~" % self.turn
 
 class GameEngine(object):
@@ -99,10 +100,11 @@ class GameEngine(object):
         :param player: Player who's playing this turn.
         """
         if self.over == 2 or not "." in self.board.board["grille"]: # Game Over
-            print "\n\tGrille finale:\n"
+            print "\n~~~~ Grille  Finale ~~~~\n"
             print self.board
             return (self.board.get_score(self.player_X), self.board.get_score(self.player_O), self.board.empty_squares())
         self.turn.display_turn()
+        print "~~~~ Plateau de Jeu ~~~~\n\n"
         print self.board
         self.scoreboard.display_score()
         valid_moves = self.player_engine.get_moves(player)
@@ -113,6 +115,7 @@ class GameEngine(object):
                 user_choice = raw_input("\nQuelle position souhaitez-vous jouer? ").upper().replace(" ", "")
                 while user_choice not in valid_moves:
                     print "\nJouez une position legale!"
+                    print "~~~~ Plateau de Jeu ~~~~\n\n"
                     print self.board
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ").upper().replace(" ", "")
             else: # AIPlayer

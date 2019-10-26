@@ -127,6 +127,29 @@ if __name__ == "__main__":
     print "\nengine_12.get_moves({}) = {} ; Resultat attendu = {}".format(player_X, res, ['C3', 'D3', 'D6', 'D7', 'D9', 'E4', 'E10', 'F8', 'F10', 'G2', 'H3', 'H8', 'I4', 'I5', 'I7', 'I8', 'J5'])
     print " ---> test {}".format(test)
 
+
+    # Test pour le plateau 8x8 initial, pour le joueur X
+    SIZE = 8
+    board_8 = Board(SIZE)
+    board_8.starting_board()
+    engine_8 = PlayerEngine(board_8, SIZE)
+    res = engine_8.get_moves(player_X)
+    if res == ['C4', 'D3', 'E6', 'F5']:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nengine_8.get_moves({}) = {} ; Resultat attendu = {}".format(player_X, res, ['C4', 'D3', 'E6', 'F5'])
+    print " ---> test {}".format(test)
+
+    # Test pour le plateau 8x8 initial, pour le joueur O
+    res = engine_8.get_moves(player_O)
+    if res == ['C5', 'D6', 'E3', 'F4']:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nengine_8.get_moves({}) = {} ; Resultat attendu = {}".format(player_O, res, ['C5', 'D6', 'E3', 'F4'])
+    print " ---> test {}".format(test)
+
     print "\n-----------------------------------------"
 
     print "\nTest de PlayerEngine.play() :"
@@ -152,3 +175,41 @@ if __name__ == "__main__":
         test = "NOK"
     print "\nengine_12.play({},{},{},{}) = {} \nResultat attendu = {}".format("E", "10", player_X,True,res,expected)
     print " ---> test {}".format(test)
+
+    # Test avec le plateau 8x8 initial, le joueur X jouant en C4
+    engine_8.play("C", "4", player_X, True)
+    res = board_8.board["grille"]
+    expected = ["."]*26+["X"]*3+["."]*6+["X","O"]+["."]*27
+    if res == expected:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nengine_8.play({},{},{},{}) = {} \nResultat attendu = {}".format("C", "4", player_X,True,res,expected)
+    print " ---> test {}".format(test)
+
+    # Test avec le plateau 8x8, le joueur O jouant en C3
+    engine_8.play("C", "3", player_O, True)
+    res = board_8.board["grille"]
+    expected = ["."]*(8*2+2)+["O"]+["."]*7+["X","O","X"]+["."]*6+["X","O"]+["."]*27
+    if res == expected:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nengine_8.play({},{},{},{}) = {} \nResultat attendu = {}".format("C", "3", player_O,True,res,expected)
+    print " ---> test {}".format(test)
+
+    # Test avec le plateau 4x4, le joueur X jouant en D4
+    engine_4.play("D", "4", player_X, True)
+    res = board_4.board["grille"]
+    expected = ["X","O","O","X"]+["O","X"]*2+["X"]*8
+    if res == expected:
+        test = "OK"
+    else:
+        test = "NOK"
+    print "\nengine_4.play({},{},{},{}) = {} \nResultat attendu = {}".format("D","4",player_X,True,res,expected)
+    print " ---> test {}".format(test)
+
+    try:
+        input("\n\n<Appuyez sur Enter pour quitter.>")
+    except:
+        pass
