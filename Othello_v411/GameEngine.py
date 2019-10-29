@@ -15,6 +15,7 @@ Description :
 
 from HumanPlayer import HumanPlayer
 from RandomPlayer import RandomPlayer
+from MaximumPlayer import MaximumPlayer
 from Board import Board
 from GamePlayer import PlayerEngine
 
@@ -123,11 +124,15 @@ class GameEngine(object):
                     print self.board
                     user_choice = raw_input("\nQuelle position souhaitez-vous jouer? (ColonneLigne) ").upper().replace(" ", "")
             else: # AIPlayer
-                print "\nC'est le tour de l'ordinateur. ({})".format(player.disk)
-                if player.disk == "X":
-                    user_choice = player.get_move(self.player_O, valid_moves, self.board, self.turn.turn)
-                else:
-                    user_choice = player.get_move(self.player_X, valid_moves, self.board, self.turn.turn)
+                if type(player) is RandomPlayer:
+                    user_choice = player.get_move(valid_moves)
+                elif type(player) is MaximumPlayer:
+                    user_choice = player.get_move(valid_moves, self.board)
+                else: #Minimax/AlphaBeta
+                    if player.disk == "X":
+                        user_choice = player.get_move(self.player_O, valid_moves, self.board, self.turn.turn)
+                    else:
+                        user_choice = player.get_move(self.player_X, valid_moves, self.board, self.turn.turn)
             print "\n{} joue en {}".format(player.name, user_choice)
             self.player_engine.play(user_choice[0], user_choice[1:], player, True)
             self.turn.change_turn()

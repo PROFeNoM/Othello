@@ -17,6 +17,8 @@ from GameEngine import GameEngine
 from HumanPlayer import HumanPlayer
 from RandomPlayer import RandomPlayer
 from AlphaBetaPlayer import AlphaBetaPlayer
+from MaximumPlayer import MaximumPlayer
+from MinimaxPlayer import MinimaxPlayer
 
 def ask_number(question, low, high):
     """
@@ -78,17 +80,39 @@ def main():
     if user_choice_gm == 1:
         name = raw_input("Entrez le nom du joueur: ")
         user_choice_c = ask_number("""
-                                 Quelle couleur voulez-vous jouer (1 ou 2):
-                                 1.- Noir
-                                 2.- Blanc
+                            Quelle couleur voulez-vous jouer (1 ou 2):
+                             1.- Noir
+                             2.- Blanc
                                  
-                                 --> """, low=1, high=2)
+                             --> """, low=1, high=2)
+        user_choice_AI = ask_number("""
+                             Contre quelle AI souhaitez-vous jouer?:
+                             1.- Random
+                             2.- Maximum
+                             3.- Minimax
+                             4.- AlphaBeta Pruning
+
+                             ---> """, low=1, high=4)
         if user_choice_c == 1:
             player_X = HumanPlayer("X", name)
-            player_O = AlphaBetaPlayer("O", "L'ordinateur", user_choice_size)
+            if user_choice_AI == 1:
+                player_O = RandomPlayer("O")
+            elif user_choice_AI == 2:
+                player_O = MaximumPlayer("O", "L'ordinateur", user_choice_size)
+            elif user_choice_AI == 3:
+                player_O = MinimaxPlayer("O", "L'ordinateur", user_choice_size)
+            else:
+                player_O = AlphaBetaPlayer("O", "L'ordinateur", user_choice_size)
         else:
             player_O = HumanPlayer("O", name)
-            player_X = AlphaBetaPlayer("X", "L'ordinateur", user_choice_size)
+            if user_choice_AI == 1:
+                player_X = RandomPlayer("X")
+            elif user_choice_AI == 2:
+                player_X = MaximumPlayer("X", "L'ordinateur", user_choice_size)
+            elif user_choice_AI == 3:
+                player_X = MinimaxPlayer("X", "L'ordinateur", user_choice_size)
+            else:
+                player_X = AlphaBetaPlayer("X", "L'ordinateur", user_choice_size)
     else:
         names = list()
         for i in range(user_choice_gm):

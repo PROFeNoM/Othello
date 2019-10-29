@@ -69,8 +69,6 @@ class MinimaxPlayer(Board):
                 board_copy = self.play(c[0], c[1:], player, deepcopy(board), True)
                 best_score = max(best_score, self.minimax(ennemy, depth-1, False, player, board_copy, alpha, beta))
                 alpha = max(alpha, best_score)
-                if beta <= alpha:
-                    break # Beta cutoff
             return best_score
         else: #Minimize
             best_score = 1e14 #inf
@@ -78,8 +76,6 @@ class MinimaxPlayer(Board):
                 board_copy = self.play(c[0], c[1:], player, deepcopy(board), True)
                 best_score = min(best_score, self.minimax(ennemy, depth-1, True, player, board_copy, alpha, beta))
                 beta = min(beta, best_score)
-                if beta <= alpha:
-                    break # Alpha cutoff
             return best_score
 
     def play(self, column, row, player, board, swap=False):

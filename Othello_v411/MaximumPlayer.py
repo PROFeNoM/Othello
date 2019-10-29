@@ -21,13 +21,14 @@ class MaximumPlayer(Board):
     def __init__(self, disk, name, SIZE):
         self.disk = disk
         self.name = name
+        self.SIZE = SIZE
         self.c = Constant(SIZE)
 
-    def get_move(self, ennemy, pos, board, turn=None):
+    def get_move(self, pos, board):
         best_score = -1e14 # -inf
         for move in pos:
             board_copy = self.play(move[0], move[1], self, deepcopy(board.board["grille"]))
-            diff = board.board["grille"].count(self.disk) - board_copy.count(self.disk)
+            diff = board_copy.count(self.disk) - board.board["grille"].count(self.disk)
             if diff > best_score:
                 best_score, best_pos = diff, move
         return best_pos
