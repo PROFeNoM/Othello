@@ -30,7 +30,6 @@ class Board(object):
         Return '.', 'O' ou 'X' according to square's disk
         :param column: Column of the position
         :param row: Row of the position
-        :param board: Board we want to get position's disk
         """
         return self.board["grille"][self.c.POSITION[column+row]] 
     
@@ -55,7 +54,6 @@ class Board(object):
         :param column: Column of the position
         :param row: Row of the position
         :param disk: Disk to put at the position
-        :param board: Board we are dealing with
         """
         self.board["grille"][self.c.POSITION[column+row]] = disk
 
