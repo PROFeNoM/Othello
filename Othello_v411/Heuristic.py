@@ -40,8 +40,8 @@ class Heuristic(PlayerEngine):
 
         # X squares possesion
         # C squares possesion
-        player_X, ennemy_X = 0, 0
-        player_C, ennemy_C = 0, 0
+        player_X = 0; ennemy_X = 0
+        player_C = 0; ennemy_C = 0
         for c in range(4):
             if board[self.c.POSITION[self.c.CORNER[c]]] == ".":
                 player_X += board[self.c.POSITION[self.c.X_SQUARES[c]]] == player.disk
@@ -53,10 +53,12 @@ class Heuristic(PlayerEngine):
         
         
         # Disk possesion
-        player_disk, ennemy_disk = board.count(player.disk), board.count(ennemy.disk)
+        player_disk = board.count(player.disk)
+        ennemy_disk =  board.count(ennemy.disk)
 
         # Possible moves
-        player_move, ennemy_move = len(self.engine.get_moves(player, board)), len(self.engine.get_moves(ennemy, board))
+        player_move = len(self.engine.get_moves(player, board))
+        ennemy_move = len(self.engine.get_moves(ennemy, board))
 
         # Total dynamic score
 
