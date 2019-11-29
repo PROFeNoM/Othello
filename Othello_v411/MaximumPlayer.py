@@ -19,12 +19,24 @@ from Board import Board
 class MaximumPlayer(Board):
 
     def __init__(self, disk, name, SIZE):
+        """
+        Initialize le nom du joueur, son disque et les outils nécéssaire au fonctionnement
+        de l'IA.
+        :param disk: Soit "X" ou "O".
+        :param name: Nom du joueur (str).
+        :param SIZE: taille du plateau.
+        """
         self.disk = disk
         self.name = name
         self.SIZE = SIZE
         self.c = Constant(SIZE)
 
     def get_move(self, pos, board):
+        """
+        Détermine une position de jeu pour l'ordinateur.
+        :param pos: Position de jeu possible de player sur le plateau en cours.
+        :param board: Plateau actuel.
+        """
         best_score = -1e14 # -inf
         for move in pos:
             board_copy = self.play(move[0], move[1], self, deepcopy(board.board["grille"]))
