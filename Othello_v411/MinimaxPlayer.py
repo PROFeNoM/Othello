@@ -10,9 +10,12 @@ Noms :
 Description :
     Ce fichier permet d'utiliser l'algorithme Minimax
     afin de permettre à l'ordinateur de jouer son coup.
+Nota: 
+    Les résultats peuvent varier avec l'élagage AlphaBeta
+    en raison de profondeur de recherche différentes.
 """
 
-from copy import deepcopy
+from copy import copy
 from GamePlayer import PlayerEngine
 from Heuristic import Heuristic
 from Board import Board
@@ -23,6 +26,13 @@ class MinimaxPlayer(Board):
     """Minimax Pruning algorithm"""
 
     def __init__(self, disk, name, SIZE):
+        """
+        Initialize le nom du joueur, son disque et les outils nécéssaire au fonctionnement
+        de l'algorithme Minimax.
+        :param disk: Soit "X" ou "O".
+        :param name: Nom du joueur (str).
+        :param SIZE: taille du plateau.
+        """
         self.disk = disk
         self.name = name
         self.SIZE = SIZE
@@ -30,7 +40,12 @@ class MinimaxPlayer(Board):
         self.c = Constant(SIZE)
 
     def progress(self, progress):
-        sys.stdout.write("\r[{}] {}%".format("#"*(int(progress/10)), round(progress, 1)))
+        """
+        Permet de mettre une barre de progrès lors de la recherche d'un coup.
+        !! NE FONCTIONNE PAS SUR IDLE !!
+        :param progress: Progrès de la barre, entre 0 et 100.
+        """
+        sys.stdout.write("\r[{}{}] {}%".format("#"*(int(progress/10)), " "*(10-int(progress/10)),round(progress, 1)))
         sys.stdout.flush()
 
     def get_move(self, ennemy, pos, board, turn):
@@ -38,44 +53,49 @@ class MinimaxPlayer(Board):
         Détermine une position de jeu pour l'ordinateur.
         La profondeur de recherche évolue au cours de la partie pour réduire
         le temps de calcul.
-        :param player: Joueur pour lequel on veut avoir la position à jouer.
         :param ennemy: Joueur adversaire de celui définit précédement.
         :param pos: Position de jeu possible de player sur le plateau en cours.
-        :param board: Plateau actuel
+        :param board: Plateau actuel.
+        :param turn: Nombre de tour de jeu.
         """
         best_score = -1e14 # -inf
         for move in pos:
             self.progress(pos.index(move)/float(len(pos))*100)
-            board_copy = self.play(move[0], move[1:], self, deepcopy(board.board["grille"]), True)
+            board_copy = self.play(move[0], move[1:], self, copy(board.board["grille"]), True)
             if turn <= 2*(self.SIZE**2-4)/3:
-                score = self.minimax(ennemy, 3, False, self, board_copy, -1e14, 1e14) # Anticipe sur 3 tours
-            elif turn >= self.SIZE**2-20:
-                score = self.minimax(ennemy, 7, False, self, board_copy, -1e14, 1e14) # Anticipe jusqu'à la fin du jeu
+                score = self.minimax(ennemy, 3, False, self, board_copy) # Anticipe sur 3 tours
+            elif turn >= self.SIZE**2-10:
+                score = self.minimax(ennemy, 5, False, self, board_copy) # Anticipe sur 5 tours sur la fin du jeu
             else:
-                score = self.minimax(ennemy, 5, False, self, board_copy, -1e14, 1e14) # Anticipe sur 7 tours
+                score = self.minimax(ennemy, 3, False, self, board_copy) # Anticipe sur 3 tours
             if score > best_score:
                 best_score, best_pos = score, move
         self.progress(100)
         return best_pos
 
-    def minimax(self, player, depth, is_maximizing_player, ennemy, board, alpha, beta):
-        """Organisation de minimax"""
+    def minimax(self, player, depth, is_maximizing_player, ennemy, board):
+        """
+        L'élagage AlphaBeta.
+        :param player: Joueur du noeud dans l'arbre.
+        :param depth: Profondeur de recherche suivant le noeud.
+        :param is_maximizing_player: Booléen caractérisant le caractère min ou max de player.
+        :param ennemy: Joueur adversaire à player.
+        :param board: Etat du plateau de jeu à un noeud donné.
+        """
         pos = self.get_moves(player, board)
         if depth == 0 or not pos:
             return self.eval.evaluation(player, ennemy, board)
         if is_maximizing_player:
             best_score = -1e14 #-inf
             for c in pos:
-                board_copy = self.play(c[0], c[1:], player, deepcopy(board), True)
-                best_score = max(best_score, self.minimax(ennemy, depth-1, False, player, board_copy, alpha, beta))
-                alpha = max(alpha, best_score)
+                board_copy = self.play(c[0], c[1:], player, copy(board), True)
+                best_score = max(best_score, self.minimax(ennemy, depth-1, False, player, board_copy))
             return best_score
         else: #Minimize
             best_score = 1e14 #inf
             for c in pos:
-                board_copy = self.play(c[0], c[1:], player, deepcopy(board), True)
-                best_score = min(best_score, self.minimax(ennemy, depth-1, True, player, board_copy, alpha, beta))
-                beta = min(beta, best_score)
+                board_copy = self.play(c[0], c[1:], player, copy(board), True)
+                best_score = min(best_score, self.minimax(ennemy, depth-1, True, player, board_copy))
             return best_score
 
     def play(self, column, row, player, board, swap=False):
