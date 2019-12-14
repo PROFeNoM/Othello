@@ -113,7 +113,7 @@ def main():
                 player_X = MinimaxPlayer("X", "L'ordinateur", user_choice_size)
             else:
                 player_X = AlphaBetaPlayer("X", "L'ordinateur", user_choice_size)
-    if user_choice_gm == 2:
+    elif user_choice_gm == 2:
         names = list()
         for i in range(user_choice_gm):
             names.append(raw_input("Entrez le nom du joueur {} ({disk}): ".format(i+1, disk="X" if i==0 else "O")))
